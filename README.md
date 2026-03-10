@@ -45,7 +45,3 @@ Aplicación web para la gestión de turnos de un complejo de canchas de fútbol 
 - `POST /api/admin/login` — Autenticación del panel de administración
 
 Documentación interactiva disponible en `/swagger`.
-
----
-
-*Desarrollado por [Matias Bueno](https://www.linkedin.com/in/matias-daniel-bueno/) · Rosario, Santa Fe, Argentina*

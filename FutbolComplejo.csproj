@@ -16,13 +16,4 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.9.0" />
   </ItemGroup>
-
-  <!-- Incluir todos los archivos CS de subdirectorios -->
-  <ItemGroup>
-    <Compile Include="Domain/**/*.cs" />
-    <Compile Include="Application/**/*.cs" />
-    <Compile Include="Infrastructure/**/*.cs" />
-    <Compile Include="API/**/*.cs" />
-  </ItemGroup>
-
 </Project>

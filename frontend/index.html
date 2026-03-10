@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚽ La Masia · Reservas</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.5/cdn.min.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void:          #080d14;
+    --bg-surface:       #0c1220;
+    --bg-card:          #101828;
+    --bg-card-hover:    #141e30;
+    --border:           #1a2640;
+    --border-bright:    #243352;
+    --accent:           #38bdf8;
+    --accent-dim:       #0ea5e9;
+    --accent-glow:      rgba(56,189,248,0.10);
+    --accent-glow-strong: rgba(56,189,248,0.22);
+    /* aliases — el código los usa con estos nombres */
+    --gold:             #38bdf8;
+    --gold-glow:        rgba(56,189,248,0.10);
+    --gold-glow-strong: rgba(56,189,248,0.22);
+    --neon:             #38bdf8;
+    --neon-dim:         #0ea5e9;
+    --neon-glow:        rgba(56,189,248,0.10);
+    --neon-glow-strong: rgba(56,189,248,0.22);
+    --green:            #22c55e;
+    --green-glow:       rgba(34,197,94,0.12);
+    --warn:             #f87171;
+    --text-primary:     #e8edf5;
+    --text-secondary:   #6b7fa3;
+    --text-muted:       #2e3f5c;
+    --field-green:      #0d2e18;
+    --field-green-light:#102e1a;
+    --field-line:       rgba(255,255,255,0.08);
+    --modal-bg:         rgba(8,13,20,0.98);
+    --radius:           6px;
+    --radius-lg:        12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+
+
+  .container { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+
+  /* ── Header ── */
+  header {
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+  .header-inner { display: flex; justify-content: space-between; align-items: center; }
+  .logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 26px; font-weight: 900; letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  /* "La Masia" — blanco puro con sombra suave */
+  .logo-name {
+    background: linear-gradient(135deg, #ffffff 0%, #c8d8e8 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .logo span { color: var(--text-secondary); -webkit-text-fill-color: var(--text-secondary); font-weight: 400; }
+  .logo-green {
+    font-style: normal;
+    color: var(--green);
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: var(--green);
+  }
+  .header-badge {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 6px 14px;
+    font-size: 12px; color: var(--text-secondary);
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--neon);
+    box-shadow: 0 0 8px var(--neon); animation: pulse-dot 2s infinite;
+  }
+  @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.85)} }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 52px 0 36px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Césped sintético SVG — rayas diagonales finas sobre verde oscuro */
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0; z-index: 0;
+    background-color: #060c18;
+    background-image:
+      repeating-linear-gradient(
+        135deg,
+        transparent,
+        transparent 18px,
+        rgba(255,255,255,0.018) 18px,
+        rgba(255,255,255,0.018) 36px
+      ),
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 18px,
+        rgba(0,0,0,0.08) 18px,
+        rgba(0,0,0,0.08) 36px
+      );
+    opacity: 0.9;
+  }
+  /* Degradado arriba y abajo para que se funda con el negro de la página */
+  .hero::after {
+    content: '';
+    position: absolute; inset: 0; z-index: 1;
+    background:
+      linear-gradient(to bottom,  #080d14 0%, transparent 18%, transparent 82%, #080d14 100%),
+      linear-gradient(to right,   #080d14 0%, transparent 12%, transparent 88%, #080d14 100%);
+  }
+  .hero .container { position: relative; z-index: 2; }
+  .hero-eyebrow {
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 5px; font-size: 12px; text-transform: uppercase;
+    color: var(--green); margin-bottom: 12px;
+  }
+  .hero-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(36px, 6vw, 64px); font-weight: 900;
+    line-height: 0.95; text-transform: uppercase; letter-spacing: -1px;
+    color: var(--text-primary);
+    text-shadow: none;
+  }
+  .hero-title .accent {
+    color: var(--green);
+    -webkit-background-clip: unset; -webkit-text-fill-color: var(--green);
+  }
+  .hero-sub {
+    margin-top: 16px; font-size: 15px; color: var(--text-secondary);
+    max-width: 480px; margin-inline: auto; line-height: 1.6;
+  }
+  .schedule-bar {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    margin-top: 28px;
+  }
+  .schedule-tag {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 14px;
+    font-size: 12px; color: var(--text-secondary);
+  }
+  .schedule-tag strong { color: var(--text-primary); }
+
+  /* ── Section title ── */
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ── Mapa de canchas ── */
+  .map-section { padding: 20px 0 16px; }
+  .courts-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    align-items: stretch;
+  }
+
+  /* Cancha individual */
+  .court-card {
+    position: relative;
+    cursor: pointer;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 2px solid var(--border);
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    background: var(--field-green);
+  }
+  .court-card:hover {
+    border-color: var(--gold);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    transform: translateY(-2px);
+  }
+  .court-card.selected { border-color: var(--gold); }
+
+  /* Todas las canchas: exactamente iguales */
+  .court-card { width: 280px; flex-shrink: 0; }
+
+  .court-field {
+    position: relative;
+    background: var(--field-green);
+    overflow: hidden;
+  }
+  .court-card .court-field { height: 175px; }
+
+  /* Césped sintético - rayas */
+  .court-field::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent, transparent 20px,
+      rgba(0,0,0,0.12) 20px, rgba(0,0,0,0.12) 40px
+    );
+  }
+
+  /* Marcas de la cancha */
+  .field-lines {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .field-svg { width: 100%; height: 100%; opacity: 0.40; }
+
+  /* Info overlay bottom */
+  .court-info {
+    background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 20px 16px 16px;
+  }
+
+  .court-number {
+    font-family: 'Inter', sans-serif;
+    font-size: 9px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase;
+    color: rgba(255,255,255,0.5); margin-bottom: 3px;
+  }
+  .court-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: #22c55e; line-height: 1;
+    text-shadow: none;
+  }
+  .court-price {
+    margin-top: 6px; font-size: 13px; color: rgba(255,255,255,0.65);
+  }
+  .court-price strong { color: var(--gold); font-size: 15px; }
+
+  /* Click indicator */
+  .court-cta {
+    position: absolute; top: 12px; right: 12px;
+    background: var(--neon-glow); border: 1px solid var(--neon);
+    border-radius: 6px; padding: 5px 10px;
+    font-size: 11px; letter-spacing: 1px; color: var(--neon);
+    text-transform: uppercase; font-weight: 600;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s;
+  }
+  .court-card:hover .court-cta {
+    background: var(--neon); color: var(--bg-void);
+  }
+
+  /* Availability indicator */
+  .avail-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; background: var(--neon);
+    box-shadow: 0 0 8px var(--neon);
+  }
+
+  /* ── Date picker strip ── */
+  .date-strip {
+    display: flex; gap: 6px; padding-bottom: 4px;
+    margin-bottom: 20px; scrollbar-width: none;
+    justify-content: center; flex-wrap: wrap;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .date-strip::-webkit-scrollbar { display: none; }
+  .date-btn {
+    flex-shrink: 0; cursor: pointer; border: 1px solid var(--border);
+    background: var(--bg-card); border-radius: var(--radius);
+    padding: 8px 12px; text-align: center;
+    transition: all 0.2s;
+    min-width: 62px;
+  }
+  .date-btn:hover { border-color: var(--border-bright); background: var(--bg-card-hover); }
+  .date-btn.active {
+    border-color: var(--neon); background: var(--neon-glow);
+    box-shadow: 0 0 16px rgba(0,255,136,0.15);
+  }
+  .date-btn .day { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+  .date-btn .num { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700; line-height: 1; }
+  .date-btn.active .num { color: var(--neon); }
+
+  /* ── Modal pop-up centrado ── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(5,11,14,0.85);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    animation: fade-in 0.2s ease;
+  }
+  @keyframes fade-in { from{opacity:0} to{opacity:1} }
+
+  .modal-panel {
+    position: relative;
+    width: 100%; max-width: 560px;
+    max-height: 90vh;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow-y: auto;
+    animation: pop-in 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    display: flex; flex-direction: column;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px var(--border);
+  }
+  @keyframes pop-in { from{transform:scale(0.88);opacity:0} to{transform:scale(1);opacity:1} }
+
+  .modal-header {
+    padding: 28px 28px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-card);
+    border-radius: 18px 18px 0 0;
+    position: sticky; top: 0; z-index: 1;
+  }
+  .modal-close {
+    position: absolute; top: 20px; right: 20px;
+    width: 32px; height: 32px; border-radius: 6px;
+    background: var(--bg-surface); border: 1px solid var(--border);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary); font-size: 18px; line-height: 1;
+    transition: all 0.2s;
+  }
+  .modal-close:hover { border-color: var(--warn); color: var(--warn); }
+  .modal-cancha-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--neon); margin-bottom: 6px;
+  }
+  .modal-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 32px; font-weight: 900; line-height: 1;
+  }
+  .modal-price {
+    margin-top: 6px; font-size: 13px; color: var(--text-secondary);
+  }
+
+  .modal-body { padding: 24px 28px; flex: 1; }
+
+  /* Slots grid */
+  .slots-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 12px;
+  }
+  .slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .slot-btn {
+    padding: 12px 8px; border-radius: var(--radius);
+    border: 1px solid var(--border);
+    cursor: pointer; text-align: center;
+    transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .slot-btn.disponible {
+    background: var(--bg-card-hover);
+    border-color: var(--border-bright);
+  }
+  .slot-btn.disponible:hover {
+    border-color: var(--neon); background: var(--neon-glow);
+    box-shadow: 0 0 12px var(--neon-glow);
+  }
+  /* ── OPCIÓN A: naranja (actual) ── */
+  .slot-btn.disponible.selected-slot {
+    border-color: var(--neon); background: var(--neon-glow);
+    box-shadow: 0 0 16px var(--neon-glow-strong);
+  }
+
+  /* ── OPCIÓN B: verde esmeralda — recomendada ✓ ── */
+  /*
+  .slot-btn.disponible.selected-slot {
+    border-color: #38bdf8; background: rgba(56,189,248,0.12);
+    box-shadow: 0 0 16px rgba(56,189,248,0.3);
+  }
+  */
+
+  /* ── OPCIÓN C: azul eléctrico ── */
+  /*
+  .slot-btn.disponible.selected-slot {
+    border-color: #00cfff; background: rgba(0,207,255,0.12);
+    box-shadow: 0 0 16px rgba(0,207,255,0.3);
+  }
+  */
+  .slot-btn.ocupado {
+    background: rgba(255,107,53,0.06); border-color: rgba(255,107,53,0.2);
+    cursor: default; opacity: 0.7;
+  }
+  .slot-hour {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 700; line-height: 1;
+    color: var(--text-primary);
+  }
+  .slot-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    margin-top: 2px;
+  }
+  .slot-btn.disponible .slot-label { color: var(--text-muted); }
+  .slot-btn.disponible:hover .slot-label, .slot-btn.disponible.selected-slot .slot-label { color: var(--neon); }
+  .slot-btn.ocupado .slot-hour { color: var(--text-muted); }
+  .slot-btn.ocupado .slot-label { color: rgba(255,107,53,0.7); }
+  .slot-btn.pasado { opacity: 0.3; cursor: not-allowed; }
+  .slot-btn.pasado .slot-hour { color: var(--text-muted); text-decoration: line-through; }
+  .slot-btn.pasado .slot-label { color: var(--text-muted); }
+
+  /* Wait list btn */
+  .waitlist-btn {
+    width: 100%; margin-top: 4px; padding: 8px;
+    background: rgba(255,107,53,0.08); border: 1px dashed rgba(255,107,53,0.3);
+    border-radius: 6px; cursor: pointer; font-size: 11px;
+    color: var(--warn); letter-spacing: 1px;
+    transition: all 0.2s; text-transform: uppercase;
+  }
+  .waitlist-btn:hover { background: rgba(255,107,53,0.15); border-color: var(--warn); }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+  /* Form */
+  .form-section h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px; font-weight: 700; margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+  .form-group { margin-bottom: 14px; }
+  label { display: block; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 6px; font-weight: 600; }
+  input, textarea, select {
+    width: 100%; background: var(--bg-card-hover); border: 1px solid var(--border-bright);
+    border-radius: var(--radius); padding: 12px 16px;
+    color: #ffffff; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 500;
+    outline: none; transition: border-color 0.2s;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--neon); box-shadow: 0 0 0 3px var(--neon-glow); }
+  input::placeholder { color: var(--text-muted); }
+
+  .form-row { display: grid; grid-template-columns: 1fr; gap: 12px; }
+
+  .submit-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #38bdf8 0%, #7dd3fc 100%);
+    color: #ffffff; border: none; border-radius: var(--radius);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s;
+    margin-top: 8px;
+  }
+  .submit-btn:hover { opacity: 0.9; }
+  .submit-btn:active { transform: translateY(0); }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .waitlist-form-btn {
+    width: 100%; padding: 12px;
+    background: transparent; border: 1px solid var(--border-bright);
+    color: var(--text-secondary); border-radius: var(--radius);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s; margin-top: 8px;
+  }
+  .waitlist-form-btn:hover { background: var(--bg-card-hover); border-color: var(--gold); color: var(--gold); }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 32px; right: 32px; z-index: 300;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 18px 22px;
+    max-width: 400px; box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+    animation: toast-in 0.35s cubic-bezier(0.4,0,0.2,1);
+    display: flex; align-items: flex-start; gap: 14px;
+  }
+  .toast.waitlist {
+    box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  }
+  @keyframes toast-in { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .toast.success { border-color: var(--neon); }
+  .toast.waitlist { border-color: var(--gold); background: var(--bg-card); }
+  .toast.error { border-color: var(--warn); }
+  .toast-icon { font-size: 20px; flex-shrink: 0; }
+  .toast-title { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; }
+  .toast.success .toast-title { color: var(--neon); }
+  .toast.waitlist .toast-title { color: var(--gold); font-size: 16px; }
+  .toast.error .toast-title { color: var(--warn); }
+  .toast-msg { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* Price summary */
+  .price-summary {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px;
+    margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .price-label { font-size: 13px; color: var(--text-secondary); }
+  .price-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 26px; font-weight: 700; color: var(--neon);
+  }
+
+  /* Loading */
+  .loading-slots {
+    grid-column: span 3; text-align: center;
+    padding: 32px; color: var(--text-muted);
+    font-size: 13px;
+  }
+  .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--neon); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+  .tab-btn {
+    padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-secondary); cursor: pointer;
+    font-size: 13px; transition: all 0.2s;
+  }
+  .tab-btn.active { border-color: var(--neon); color: var(--neon); background: var(--neon-glow); }
+
+  /* ── Badge disponibilidad en court card ── */
+  .avail-badge {
+    position: absolute; top: 10px; left: 10px; z-index: 2;
+    font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 20px;
+  }
+  .avail-badge.ok   { background: rgba(56,189,248,0.1); color: #38bdf8; border: 1px solid rgba(56,189,248,0.25); }
+  .avail-badge.low  { background: rgba(232,160,32,0.1);   color: var(--gold); border: 1px solid rgba(232,160,32,0.3); }
+  .avail-badge.full { background: rgba(239,68,68,0.1);   color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
+
+  /* ── Precio total destacado ── */
+  .price-total-box {
+    background: rgba(240,180,41,0.08); border: 1px solid rgba(240,180,41,0.3);
+    border-radius: 10px; padding: 12px 16px; margin-top: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .price-total-label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+  .price-total-amount {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px; font-weight: 900; color: #38bdf8;
+    text-shadow: 0 0 12px rgba(56,189,248,0.3);
+  }
+
+  /* ── Modal Mis Reservas ── */
+  .my-bookings-panel { padding: 0; }
+  .booking-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; border: 1px solid var(--border);
+    border-radius: var(--radius); background: var(--bg-card);
+    margin-bottom: 10px;
+  }
+  .booking-item:hover { border-color: var(--border-bright); }
+  .booking-court { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; }
+  .booking-detail { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .booking-badge {
+    font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+    background: rgba(56,189,248,0.12); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3);
+  }
+  .my-bookings-search {
+    display: flex; gap: 8px; margin-bottom: 16px;
+  }
+  .my-bookings-search input { flex: 1; }
+  .my-bookings-search button {
+    padding: 10px 16px; background: var(--neon); color: var(--bg-void);
+    border: none; border-radius: var(--radius); font-weight: 700; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 14px; letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .no-bookings { text-align:center; color: var(--text-muted); font-size:14px; padding: 32px 0; }
+
+
+  /* ── Panel Admin ── */
+  .admin-tabs { display:flex; gap:6px; margin-bottom:20px; flex-wrap:wrap; }
+  .admin-tab {
+    padding:7px 14px; border-radius:6px; border:1px solid var(--border);
+    background:transparent; color:var(--text-secondary); cursor:pointer;
+    font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase;
+    transition:all 0.2s; font-family:'Inter',sans-serif;
+  }
+  .admin-tab.active { border-color:var(--neon); color:var(--neon); background:var(--neon-glow); }
+
+  .admin-day-selector { display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+  .admin-day-btn {
+    padding:5px 12px; border-radius:6px; border:1px solid var(--border);
+    background:var(--bg-card); color:var(--text-secondary); cursor:pointer;
+    font-size:11px; font-weight:600; transition:all 0.2s;
+  }
+  .admin-day-btn.active { border-color:var(--neon); color:var(--neon); }
+
+  .reserva-row {
+    display:grid; grid-template-columns:60px 1fr auto;
+    gap:12px; align-items:center;
+    padding:10px 14px; border-radius:8px; border:1px solid var(--border);
+    background:var(--bg-card); margin-bottom:8px;
+  }
+  .reserva-hora { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:700; color:var(--neon); }
+  .reserva-nombre { font-size:14px; font-weight:600; }
+  .reserva-tel { font-size:11px; color:var(--text-muted); margin-top:2px; }
+  .reserva-cancha-tag {
+    font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px;
+    background:rgba(56,189,248,0.12); color:#38bdf8; border:1px solid rgba(56,189,248,0.3);
+    white-space:nowrap;
+  }
+  .slot-blocked {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 14px; border-radius:8px; border:1px dashed rgba(255,71,87,0.4);
+    background:rgba(255,71,87,0.05); margin-bottom:8px;
+  }
+  .slot-blocked span { font-size:13px; color:#ff4757; }
+  .unblock-btn {
+    font-size:11px; padding:3px 10px; border-radius:6px;
+    border:1px solid rgba(255,71,87,0.4); background:transparent;
+    color:#ff4757; cursor:pointer; transition:all 0.2s;
+  }
+  .unblock-btn:hover { background:rgba(255,71,87,0.1); }
+
+  .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+  .stat-card {
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:10px; padding:14px 16px;
+  }
+  .stat-value { font-family:'Barlow Condensed',sans-serif; font-size:32px; font-weight:900; color:var(--neon); }
+  .stat-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+  .bar-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .bar-label { font-size:12px; color:var(--text-secondary); width:56px; flex-shrink:0; }
+  .bar-track { flex:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
+  .bar-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,#38bdf8,#7dd3fc); transition:width 0.6s; }
+  .bar-count { font-size:11px; color:var(--text-muted); width:20px; text-align:right; }
+
+  .export-btn {
+    width:100%; padding:12px; border-radius:var(--radius);
+    font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700;
+    letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:all 0.2s;
+    margin-bottom:10px; border:1px solid;
+  }
+  .export-wa { background:rgba(56,189,248,0.1); border-color:rgba(56,189,248,0.4); color:#25d366; }
+  .export-wa:hover { background:rgba(56,189,248,0.2); }
+  .export-xl { background:rgba(33,115,70,0.1); border-color:rgba(33,115,70,0.4); color:#21c55d; }
+  .export-xl:hover { background:rgba(33,115,70,0.2); }
+
+  .block-form { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .block-form select, .block-form input[type=date] { flex:1; min-width:120px; }
+  .block-form button {
+    padding:10px 16px; background:rgba(255,71,87,0.15); border:1px solid rgba(255,71,87,0.4);
+    color:#ff4757; border-radius:var(--radius); cursor:pointer; font-weight:700;
+    font-family:'Barlow Condensed',sans-serif; letter-spacing:1px; font-size:14px;
+    transition:all 0.2s;
+  }
+  .block-form button:hover { background:rgba(255,71,87,0.25); }
+
+  .admin-empty { text-align:center; color:var(--text-muted); font-size:13px; padding:24px 0; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+  /* ═══════════════════════════════════════════════════════════
+     RESPONSIVE — todos los breakpoints
+     320px   iPhone SE / teléfonos pequeños
+     375px   iPhone estándar
+     428px   iPhone Pro Max / Android grandes
+     600px   teléfonos landscape / tablets pequeñas
+     768px   iPad portrait
+     900px   iPad landscape / tablets
+     1024px  notebooks pequeñas / iPad Pro portrait
+     1280px  notebook estándar
+     1440px  desktop estándar
+     1920px  Full HD / monitor grande
+     2560px  2K / iMac
+     3840px  4K / TV
+  ═══════════════════════════════════════════════════════════ */
+
+  /* ── 320-374px: iPhone SE, teléfonos muy chicos ── */
+  @media (max-width: 374px) {
+    .container { padding: 0 12px; }
+    .logo { font-size: 18px; letter-spacing: 1px; }
+    .hero-title { font-size: 34px; }
+    .hero-sub { font-size: 13px; }
+    .schedule-bar { gap: 6px; }
+    .schedule-tag { font-size: 11px; padding: 5px 10px; }
+    .courts-wrapper { gap: 12px; }
+    .court-card { width: 100%; }
+    .court-card .court-field { height: 150px; }
+    .date-btn { min-width: 54px; padding: 8px 10px; }
+    .date-btn .num { font-size: 20px; }
+    .slots-grid { grid-template-columns: repeat(2, 1fr); }
+    .modal-panel { border-radius: 0; }
+    .modal-header { padding: 20px 16px 16px; }
+    .modal-body { padding: 16px; }
+    .modal-title { font-size: 24px; }
+    .form-row { grid-template-columns: 1fr; }
+    .hero::before, .hero::after { display: none; }
+  }
+
+  /* ── 375-427px: iPhone estándar ── */
+  @media (min-width: 375px) and (max-width: 427px) {
+    .container { padding: 0 16px; }
+    .logo { font-size: 20px; }
+    .courts-wrapper { gap: 12px; }
+    .court-card { width: 100%; }
+    .court-card .court-field { height: 160px; }
+    .date-btn { min-width: 58px; }
+    .slots-grid { grid-template-columns: repeat(3, 1fr); }
+    .modal-panel { border-radius: 0; }
+    .modal-header { padding: 22px 20px 16px; }
+    .modal-body { padding: 18px 20px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  /* ── Todos los móviles portrait (< 600px): modal bottom-sheet ── */
+  @media (max-width: 599px) {
+    .modal-overlay { padding: 0; align-items: flex-end; }
+    .modal-panel { max-width: 100%; max-height: 92vh; border-radius: 16px 16px 0 0; margin: 0; }
+    @keyframes pop-in { from{transform:translateY(60px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .courts-wrapper { flex-direction: column; align-items: center; }
+    .court-card { width: 100%; max-width: 400px; }
+    header { padding: 14px 0; }
+    .logo { font-size: 20px; }
+    .date-strip { justify-content: flex-start; flex-wrap: nowrap; }
+  }
+
+  /* ── 428-599px: iPhone Pro Max, Android XL ── */
+  @media (min-width: 428px) and (max-width: 599px) {
+    .court-card { max-width: 428px; }
+    .court-card .court-field { height: 180px; }
+    .slots-grid { grid-template-columns: repeat(3, 1fr); }
+    .modal-title { font-size: 28px; }
+  }
+
+  /* ── 600-767px: landscape móvil / tablet pequeña ── */
+  @media (min-width: 600px) and (max-width: 767px) {
+    .courts-wrapper { flex-wrap: wrap; justify-content: center; gap: 16px; }
+    .court-card { width: calc(50% - 8px); min-width: 240px; }
+    .modal-panel { max-width: 520px; border-radius: 14px; }
+    .modal-overlay { padding: 16px; align-items: center; }
+    .form-row { grid-template-columns: 1fr 1fr; }
+    .date-strip { justify-content: center; flex-wrap: wrap; overflow-x: unset; }
+  }
+
+  /* ── 768-899px: iPad portrait ── */
+  @media (min-width: 768px) and (max-width: 899px) {
+    .courts-wrapper { flex-wrap: wrap; justify-content: center; gap: 16px; }
+    .court-card { width: 280px; }
+    .modal-panel { max-width: 540px; }
+    .container { padding: 0 32px; }
+    .hero-title { font-size: 52px; }
+    .date-strip { justify-content: center; flex-wrap: wrap; overflow-x: unset; }
+  }
+
+  /* ── 900-1023px: iPad landscape / tablet grande ── */
+  @media (min-width: 900px) and (max-width: 1023px) {
+    .courts-wrapper { gap: 16px; justify-content: center; }
+    .court-card { width: 260px; }
+    .container { padding: 0 40px; }
+  }
+
+  /* ── 1024-1279px: notebook pequeña / iPad Pro ── */
+  @media (min-width: 1024px) and (max-width: 1279px) {
+    .court-card { width: 270px; }
+    .container { max-width: 1100px; }
+  }
+
+  /* ── 1280-1439px: notebook estándar ── */
+  @media (min-width: 1280px) and (max-width: 1439px) {
+    .court-card { width: 280px; }
+    .container { max-width: 1240px; }
+  }
+
+  /* ── 1440-1919px: desktop / monitor estándar ── */
+  @media (min-width: 1440px) and (max-width: 1919px) {
+    .court-card { width: 300px; }
+    .court-card .court-field { height: 185px; }
+    .container { max-width: 1360px; }
+    .hero-title { font-size: 72px; }
+  }
+
+  /* ── 1920-2559px: Full HD / monitor grande ── */
+  @media (min-width: 1920px) and (max-width: 2559px) {
+    .court-card { width: 340px; }
+    .court-card .court-field { height: 210px; }
+    .court-name { font-size: 26px; }
+    .container { max-width: 1200px; padding: 0 48px; }
+    .hero-title { font-size: 80px; }
+    .hero-sub { font-size: 17px; }
+    .date-btn { min-width: 80px; padding: 12px 20px; }
+    .date-btn .num { font-size: 28px; }
+    .modal-panel { max-width: 640px; }
+    .courts-wrapper { justify-content: center; }
+    body { font-size: 16px; }
+  }
+
+  /* ── 2560-3839px: 2K / iMac / pantalla grande ── */
+  @media (min-width: 2560px) and (max-width: 3839px) {
+    :root { --radius: 10px; --radius-lg: 16px; }
+    .court-card { width: 420px; }
+    .court-card .court-field { height: 260px; }
+    .court-name { font-size: 32px; }
+    .court-price { font-size: 16px; }
+    .court-price strong { font-size: 18px; }
+    .container { max-width: 2200px; padding: 0 80px; }
+    .hero-title { font-size: 110px; letter-spacing: -2px; }
+    .hero-sub { font-size: 20px; max-width: 640px; }
+    .logo { font-size: 36px; }
+    header { padding: 28px 0; }
+    .date-btn { min-width: 90px; padding: 14px 22px; }
+    .date-btn .num { font-size: 32px; }
+    .modal-panel { max-width: 760px; }
+    .modal-title { font-size: 44px; }
+    .slot-hour { font-size: 26px; }
+    body { font-size: 18px; }
+  }
+
+  /* ── 3840px+: 4K / TV ── */
+  @media (min-width: 3840px) {
+    :root { --radius: 14px; --radius-lg: 22px; }
+    .court-card { width: 560px; }
+    .court-card .court-field { height: 350px; }
+    .court-name { font-size: 42px; }
+    .court-price { font-size: 20px; }
+    .court-price strong { font-size: 24px; }
+    .container { max-width: 3200px; padding: 0 120px; }
+    .hero-title { font-size: 160px; letter-spacing: -4px; }
+    .hero-sub { font-size: 28px; max-width: 900px; }
+    .logo { font-size: 52px; letter-spacing: 4px; }
+    header { padding: 40px 0; }
+    .date-btn { min-width: 120px; padding: 20px 28px; }
+    .date-btn .num { font-size: 44px; }
+    .modal-panel { max-width: 1100px; }
+    .modal-title { font-size: 60px; }
+    .modal-header { padding: 48px 48px 32px; }
+    .modal-body { padding: 40px 48px; }
+    .slot-hour { font-size: 36px; }
+    .slots-grid { gap: 14px; }
+    .slot-btn { padding: 20px 12px; }
+    input, select, textarea { padding: 18px 24px; font-size: 20px; }
+    .submit-btn { padding: 22px; font-size: 24px; }
+    body { font-size: 22px; }
+  }
+
+  /* ── Touch: quitar hovers que no aplican ── */
+  @media (hover: none) {
+    .court-card:hover { transform: none; box-shadow: none; border-color: var(--border); }
+    .slot-btn.disponible:hover { border-color: var(--border-bright); background: var(--bg-card-hover); box-shadow: none; }
+    .submit-btn:hover { opacity: 1; }
+  }
+
+  /* ── Landscape en móvil: ajustar hero y modal ── */
+  @media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+    .hero { padding: 20px 0 16px; }
+    .hero-title { font-size: 36px; }
+    .schedule-bar { margin-top: 12px; }
+    .modal-panel { max-height: 100vh; border-radius: 0; }
+    .modal-overlay { align-items: flex-start; padding: 0; }
+  }
+
+  /* ── Accesibilidad: reducir movimiento ── */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.1ms !important; }
+  }
+</style>
+</head>
+<body x-data="app()" x-init="init()">
+
+<!-- ── Header ───────────────────────────────────────────────────── -->
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo"><span class="logo-name">La Masia</span> <span>·</span> <em class="logo-green">Cancha</em></div>
+      <div style="display:flex;gap:10px;align-items:center;">
+
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── Hero ─────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">Rosario · Santa Fe</div>
+    <h1 class="hero-title">Reservá<br>tu <span class="accent">cancha</span></h1>
+    <p class="hero-sub">Elegí tu cancha en el mapa, seleccioná el horario y confirmá tu turno en segundos.</p>
+    <div class="schedule-bar">
+      <span class="schedule-tag"><strong>Lun–Vie</strong> 16:00 – 01:00</span>
+      <span class="schedule-tag"><strong>Sáb–Dom</strong> 16:00 – 02:00</span>
+      <span class="schedule-tag">Fútbol 5 y Fútbol 7</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Mapa Canchas ──────────────────────────────────────────────── -->
+<section class="map-section">
+  <div class="container">
+
+    <div class="section-header">
+      <div class="section-line"></div>
+      <div class="section-title">Mapa de Canchas</div>
+      <div class="section-line"></div>
+    </div>
+
+    <!-- Date picker -->
+    <div class="date-strip">
+      <template x-for="d in dates" :key="d.iso">
+        <div class="date-btn" :class="{active: selectedDate === d.iso}" @click="selectDate(d.iso)">
+          <div class="day" x-text="d.dayName"></div>
+          <div class="num" x-text="d.dayNum"></div>
+          <div class="day" x-text="d.monthShort"></div>
+        </div>
+      </template>
+    </div>
+
+    <!-- Courts map -->
+    <div class="courts-wrapper">
+
+      <!-- Cancha 1 — Fútbol 7 -->
+      <div class="court-card" :class="{selected: selectedCourt === 1}" @click="openCourt(1)">
+        <div class="avail-bar"></div>
+        <div class="avail-badge" :class="courtAvailClass(1)" x-text="courtAvailText(1)"></div>
+        <div class="court-field">
+          <div class="field-lines">
+            <svg class="field-svg" viewBox="0 0 280 175" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="8" y="8" width="264" height="159" stroke="white" stroke-width="2"/>
+              <line x1="140" y1="8" x2="140" y2="167" stroke="white" stroke-width="1.5"/>
+              <circle cx="140" cy="87" r="30" stroke="white" stroke-width="1.5"/>
+              <circle cx="140" cy="87" r="3" fill="white"/>
+              <rect x="8" y="48" width="42" height="79" stroke="white" stroke-width="1.5"/>
+              <rect x="8" y="63" width="18" height="49" stroke="white" stroke-width="1.5"/>
+              <rect x="230" y="48" width="42" height="79" stroke="white" stroke-width="1.5"/>
+              <rect x="254" y="63" width="18" height="49" stroke="white" stroke-width="1.5"/>
+              <circle cx="62" cy="87" r="2.5" fill="white"/>
+              <circle cx="218" cy="87" r="2.5" fill="white"/>
+            </svg>
+          </div>
+          <div class="court-info">
+            <div class="court-number">Cancha · 01</div>
+            <div class="court-name">Fútbol 7</div>
+            <div class="court-price"><strong>$45.000</strong> / hora</div>
+          </div>
+          <div class="court-cta">Reservar</div>
+        </div>
+      </div>
+
+      <!-- Cancha 2 — Fútbol 5 -->
+      <div class="court-card" :class="{selected: selectedCourt === 2}" @click="openCourt(2)">
+        <div class="avail-bar"></div>
+        <div class="avail-badge" :class="courtAvailClass(2)" x-text="courtAvailText(2)"></div>
+        <div class="court-field">
+          <div class="field-lines">
+            <svg class="field-svg" viewBox="0 0 280 175" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="8" y="8" width="264" height="159" stroke="white" stroke-width="2"/>
+              <line x1="140" y1="8" x2="140" y2="167" stroke="white" stroke-width="1.5"/>
+              <circle cx="140" cy="87" r="30" stroke="white" stroke-width="1.5"/>
+              <circle cx="140" cy="87" r="3" fill="white"/>
+              <rect x="8" y="48" width="42" height="79" stroke="white" stroke-width="1.5"/>
+              <rect x="8" y="63" width="18" height="49" stroke="white" stroke-width="1.5"/>
+              <rect x="230" y="48" width="42" height="79" stroke="white" stroke-width="1.5"/>
+              <rect x="254" y="63" width="18" height="49" stroke="white" stroke-width="1.5"/>
+              <circle cx="62" cy="87" r="2.5" fill="white"/>
+              <circle cx="218" cy="87" r="2.5" fill="white"/>
+            </svg>
+          </div>
+          <div class="court-info">
+            <div class="court-number">Cancha · 02</div>
+            <div class="court-name">Fútbol 5</div>
+            <div class="court-price"><strong>$35.000</strong> / hora</div>
+          </div>
+          <div class="court-cta">Reservar</div>
+        </div>
+      </div>
+
+      <!-- Cancha 3 — Fútbol 5 -->
+      <div class="court-card" :class="{selected: selectedCourt === 3}" @click="openCourt(3)">
+        <div class="avail-bar" style="background:var(--accent);"></div>
+        <div class="avail-badge" :class="courtAvailClass(3)" x-text="courtAvailText(3)"></div>
+        <div class="court-field">
+          <div class="field-lines">
+            <svg class="field-svg" viewBox="0 0 280 175" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="8" y="8" width="264" height="159" stroke="white" stroke-width="2"/>
+              <line x1="140" y1="8" x2="140" y2="167" stroke="white" stroke-width="1.5"/>
+              <circle cx="140" cy="87" r="30" stroke="white" stroke-width="1.5"/>
+              <circle cx="140" cy="87" r="3" fill="white"/>
+              <rect x="8" y="48" width="42" height="79" stroke="white" stroke-width="1.5"/>
+              <rect x="8" y="63" width="18" height="49" stroke="white" stroke-width="1.5"/>
+              <rect x="230" y="48" width="42" height="79" stroke="white" stroke-width="1.5"/>
+              <rect x="254" y="63" width="18" height="49" stroke="white" stroke-width="1.5"/>
+              <circle cx="62" cy="87" r="2.5" fill="white"/>
+              <circle cx="218" cy="87" r="2.5" fill="white"/>
+            </svg>
+          </div>
+          <div class="court-info">
+            <div class="court-number">Cancha · 03</div>
+            <div class="court-name">Fútbol 5</div>
+            <div class="court-price"><strong>$30.000</strong> / hora</div>
+          </div>
+          <div class="court-cta">Reservar</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Instrucciones -->
+    <div style="margin-top:24px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding:0 8px;">
+      <div style="display:flex;align-items:center;gap:10px;color:var(--text-muted);font-size:13px;">
+        <span style="width:24px;height:24px;border-radius:50%;background:var(--bg-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;">1</span>
+        Hacé clic en una cancha
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;color:var(--text-muted);font-size:13px;">
+        <span style="width:24px;height:24px;border-radius:50%;background:var(--bg-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;">2</span>
+        Elegí el día y horario
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;color:var(--text-muted);font-size:13px;">
+        <span style="width:24px;height:24px;border-radius:50%;background:var(--bg-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;">3</span>
+        Confirmá con tu nombre y WhatsApp
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── Modal Admin ──────────────────────────────────────────────── -->
+<div class="modal-overlay" x-show="adminOpen" @click.self="adminOpen=false" x-cloak style="display:none">
+  <div class="modal-panel" @click.stop style="max-width:620px;">
+    <div class="modal-header" style="border-radius:18px 18px 0 0;">
+      <button class="modal-close" @click="adminOpen=false">✕</button>
+      <div class="modal-cancha-badge">PANEL</div>
+      <div class="modal-title">Administración</div>
+    </div>
+    <div class="modal-body">
+
+      <div class="admin-tabs">
+        <button class="admin-tab" :class="{active:adminTab==='reservas'}" @click="adminTab='reservas'">📅 Reservas del día</button>
+        <button class="admin-tab" :class="{active:adminTab==='bloqueos'}" @click="adminTab='bloqueos'">🔒 Bloquear horarios</button>
+        <button class="admin-tab" :class="{active:adminTab==='export'}" @click="adminTab='export'">📤 Exportar</button>
+      </div>
+
+      <!-- ══ RESERVAS DEL DÍA ══ -->
+      <div x-show="adminTab==='reservas'">
+        <div class="admin-day-selector">
+          <template x-for="d in dates.slice(0,7)" :key="d.iso">
+            <button class="admin-day-btn" :class="{active: adminDate===d.iso}" @click="adminDate=d.iso"
+              x-text="d.dayName + ' ' + d.dayNum"></button>
+          </template>
+        </div>
+        <template x-if="adminReservas().length === 0">
+          <div class="admin-empty">Sin reservas para este día.</div>
+        </template>
+        <template x-for="r in adminReservas()" :key="r.id">
+          <div class="reserva-row">
+            <div class="reserva-hora" x-text="r.hora + 'hs'"></div>
+            <div>
+              <div class="reserva-nombre" x-text="r.nombre"></div>
+              <div class="reserva-tel" x-text="r.telefono"></div>
+            </div>
+            <div class="reserva-cancha-tag" x-text="'C' + r.court + ' · ' + r.courtName"></div>
+          </div>
+        </template>
+      </div>
+
+      <!-- ══ BLOQUEAR HORARIOS ══ -->
+      <div x-show="adminTab==='bloqueos'">
+        <div class="block-form">
+          <select x-model="blockForm.court">
+            <option value="">Todas las canchas</option>
+            <option value="1">Cancha 1 · Fútbol 7</option>
+            <option value="2">Cancha 2 · Fútbol 5</option>
+            <option value="3">Cancha 3 · Fútbol 5</option>
+          </select>
+          <select x-model="blockForm.hora">
+            <option value="">Horario...</option>
+            <template x-for="h in allSlots" :key="h">
+              <option :value="h" x-text="h + 'hs'"></option>
+            </template>
+          </select>
+          <input type="date" x-model="blockForm.date">
+          <button @click="addBlock()">🔒 Bloquear</button>
+        </div>
+        <template x-if="blockedSlots.length === 0">
+          <div class="admin-empty">No hay horarios bloqueados.</div>
+        </template>
+        <template x-for="(b, i) in blockedSlots" :key="i">
+          <div class="slot-blocked">
+            <span x-text="(b.court ? 'C'+b.court+' · ' : 'Todas · ') + b.hora + 'hs · ' + b.date"></span>
+            <button class="unblock-btn" @click="blockedSlots.splice(i,1)">Desbloquear</button>
+          </div>
+        </template>
+      </div>
+
+      <!-- ══ EXPORTAR ══ -->
+      <div x-show="adminTab==='export'">
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;line-height:1.6;">
+          Exportá las reservas del día para compartirlas con el encargado o tener un respaldo.
+        </p>
+        <button class="export-btn export-wa" @click="exportWhatsApp()">📱 Compartir por WhatsApp</button>
+        <button class="export-btn export-xl" @click="exportCSV()">📊 Descargar Excel (CSV)</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal Mis Reservas ──────────────────────────────────────── -->
+<div class="modal-overlay" x-show="myBookingsOpen" @click.self="myBookingsOpen=false" x-cloak style="display:none">
+  <div class="modal-panel" @click.stop style="max-width:480px;">
+    <div class="modal-header" style="border-radius:18px 18px 0 0;">
+      <button class="modal-close" @click="myBookingsOpen=false">✕</button>
+      <div class="modal-cancha-badge">TUS TURNOS</div>
+      <div class="modal-title">Mis Reservas</div>
+    </div>
+    <div class="modal-body my-bookings-panel">
+      <div class="my-bookings-search">
+        <input type="tel" x-model="myBookingsPhone" placeholder="Ingresá tu WhatsApp...">
+        <button @click="searchMyBookings()">Buscar</button>
+      </div>
+      <template x-if="myBookings.length === 0 && myBookingsSearched">
+        <div class="no-bookings">😕 No encontramos reservas para ese número.</div>
+      </template>
+      <template x-if="myBookings.length > 0">
+        <div>
+          <template x-for="b in myBookings" :key="b.id">
+            <div class="booking-item">
+              <div>
+                <div class="booking-court" x-text="'Cancha ' + b.court + ' · ' + b.name"></div>
+                <div class="booking-detail" x-text="b.date + ' · ' + b.hora + 'hs'"></div>
+              </div>
+              <div class="booking-badge">Confirmado</div>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal / Side Panel ────────────────────────────────────────── -->
+<div class="modal-overlay" x-show="modalOpen" @click.self="closeModal()" x-cloak style="display:none">
+  <div class="modal-panel" @click.stop>
+
+    <!-- Header -->
+    <div class="modal-header">
+      <button class="modal-close" @click="closeModal()">✕</button>
+      <div class="modal-cancha-badge" x-text="'CANCHA · 0' + selectedCourt"></div>
+      <div class="modal-title" x-text="courts[selectedCourt - 1]?.name"></div>
+      <div class="modal-price">
+        <span x-text="'$' + courts[selectedCourt-1]?.price.toLocaleString('es-AR')"></span> ARS / hora
+      </div>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn" :class="{active: tab === 'reservar'}" @click="tab = 'reservar'">Reservar</button>
+        <button class="tab-btn" :class="{active: tab === 'espera'}" @click="tab = 'espera'">Lista de Espera</button>
+      </div>
+
+      <!-- ══ TAB RESERVAR ══ -->
+      <div x-show="tab === 'reservar'">
+        <!-- Slots -->
+        <div class="slots-title">Turnos disponibles · <span x-text="formattedSelectedDate"></span></div>
+        <div class="slots-grid">
+          <template x-if="loadingSlots">
+            <div class="loading-slots">
+              <span class="spinner"></span> Cargando turnos...
+            </div>
+          </template>
+          <template x-if="!loadingSlots">
+            <template x-for="slot in slots" :key="slot.hora">
+              <div>
+                <div class="slot-btn"
+                     :class="slot.pasado ? 'pasado' : (slot.disponible ? (selectedSlot === slot.hora ? 'disponible selected-slot' : 'disponible') : 'ocupado')"
+                     @click="slot.disponible && !slot.pasado && selectSlot(slot.hora)">
+                  <div class="slot-hour" x-text="slot.hora"></div>
+                  <div class="slot-label" x-text="slot.pasado ? 'Pasado' : (slot.disponible ? 'Libre' : 'Ocupado')"></div>
+                </div>
+                <div x-show="!slot.disponible && !slot.pasado">
+                  <button class="waitlist-btn" @click="openWaitlistForSlot(slot.hora)">
+                    + Espera
+                  </button>
+                </div>
+              </div>
+            </template>
+          </template>
+        </div>
+
+        <!-- Precio -->
+        <template x-if="selectedSlot">
+          <div style="text-align:right;margin-top:14px;margin-bottom:2px;">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#38bdf8;text-shadow:0 0 10px rgba(59,130,246,0.2);"
+              x-text="'$' + courts[selectedCourt-1]?.price.toLocaleString('es-AR')"></span>
+            <span style="font-size:12px;color:var(--text-muted);margin-left:4px;">/ hora</span>
+          </div>
+        </template>
+
+        <!-- Form -->
+        <template x-if="selectedSlot">
+          <div class="form-section">
+            <div class="divider"></div>
+            <h3>Datos del turno</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nombre completo</label>
+                <input type="text" x-model="form.nombre">
+              </div>
+              <div class="form-group">
+                <label>WhatsApp</label>
+                <input type="tel" x-model="form.telefono">
+              </div>
+            </div>
+            <button class="submit-btn" @click="confirmarReserva()" :disabled="submitting || !form.nombre || !form.telefono">
+              <template x-if="submitting">
+                <span><span class="spinner" style="border-top-color:var(--bg-void)"></span> Confirmando...</span>
+              </template>
+              <template x-if="!submitting">
+                <span>⚽ Confirmar reserva</span>
+              </template>
+            </button>
+          </div>
+        </template>
+      </div>
+
+      <!-- ══ TAB LISTA DE ESPERA ══ -->
+      <div x-show="tab === 'espera'">
+        <div style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);border-radius:10px;padding:14px 16px;margin-bottom:20px;display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-size:22px;line-height:1;">📲</span>
+          <div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#38bdf8;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Lista de espera</div>
+            <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;margin:0;">Si el horario está ocupado, anotate. <strong style="color:#38bdf8;">Te avisamos por WhatsApp</strong> si se libera un turno.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Horario deseado</label>
+          <select x-model="waitlistForm.hora">
+            <option value="">Seleccionar horario...</option>
+            <template x-for="slot in ocupadosSlots" :key="slot.hora">
+              <option :value="slot.hora" x-text="slot.hora + ' hs'"></option>
+            </template>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre completo</label>
+            <input type="text" x-model="waitlistForm.nombre">
+          </div>
+          <div class="form-group">
+            <label>WhatsApp</label>
+            <input type="tel" x-model="waitlistForm.telefono">
+          </div>
+        </div>
+
+        <button class="waitlist-form-btn" @click="registrarEspera()"
+          :disabled="submitting || !waitlistForm.nombre || !waitlistForm.telefono || !waitlistForm.hora">
+          📲 Anotarme en lista de espera
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ─────────────────────────────────────────────────────── -->
+<template x-if="toast.visible">
+  <div class="toast" :class="toast.type">
+    <div class="toast-icon" x-text="toast.type === 'waitlist' ? '✔' : toast.type === 'success' ? '✅' : '❌'" :style="toast.type === 'waitlist' ? 'font-size:28px;color:#38bdf8;font-weight:900;line-height:1;' : 'font-size:20px'"></div>
+    <div>
+      <div class="toast-title" x-text="toast.title"></div>
+      <div class="toast-msg" x-text="toast.msg"></div>
+    </div>
+  </div>
+</template>
+
+<script>
+// Detecta automáticamente si está en Railway (producción) o local
+const API_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000/api'
+  : window.location.origin + '/api';
+
+const MOCK_SLOTS = {
+  1: ['16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','00:00'],
+  2: ['16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','00:00'],
+  3: ['16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','00:00'],
+};
+const MOCK_OCUPADOS = { 1: ['19:00','21:00'], 2: ['17:00','20:00','22:00'], 3: ['18:00'] };
+
+const COURTS = [
+  { id: 1, name: 'Fútbol 7', price: 45000 },
+  { id: 2, name: 'Fútbol 5', price: 35000 },
+  { id: 3, name: 'Fútbol 5', price: 30000 },
+];
+
+function app() {
+  return {
+    courts: COURTS,
+    modalOpen: false,
+    selectedCourt: null,
+    selectedDate: '',
+    selectedSlot: null,
+    tab: 'reservar',
+    slots: [],
+    loadingSlots: false,
+    submitting: false,
+    dates: [],
+    form: { nombre: '', telefono: '' },
+    waitlistForm: { nombre: '', telefono: '', hora: '' },
+    toast: { visible: false, type: 'success', title: '', msg: '' },
+    myBookingsOpen: false,
+    myBookingsPhone: '',
+    myBookings: [],
+    myBookingsSearched: false,
+    sessionBookings: [],
+    adminOpen: false,
+    adminTab: 'reservas',
+    adminDate: '',
+    blockForm: { court: '', hora: '', date: '' },
+    blockedSlots: [],
+    allSlots: ['16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','00:00'],
+    statsHorarios: [
+      {hora:'16',count:1},{hora:'17',count:2},{hora:'18',count:3},
+      {hora:'19',count:4},{hora:'20',count:5},{hora:'21',count:3},
+      {hora:'22',count:2},{hora:'23',count:1},{hora:'00',count:1},
+    ],
+    mockAdminReservas: [
+      { id:'m1', court:1, courtName:'Fútbol 7', hora:'17:00', nombre:'Lucas Pérez',   telefono:'+54 9 341 123-4567' },
+      { id:'m2', court:2, courtName:'Fútbol 5', hora:'18:00', nombre:'Martín López',  telefono:'+54 9 341 234-5678' },
+      { id:'m3', court:3, courtName:'Fútbol 5', hora:'20:00', nombre:'Diego Ramírez', telefono:'+54 9 341 345-6789' },
+    ],
+
+    get formattedSelectedDate() {
+      if (!this.selectedDate) return '';
+      const d = new Date(this.selectedDate + 'T00:00:00');
+      return d.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
+    },
+
+    get ocupadosSlots() {
+      return this.slots.filter(s => !s.disponible);
+    },
+
+    courtAvailCount(courtId) {
+      const ocupados = MOCK_OCUPADOS[courtId] || [];
+      return MOCK_SLOTS[courtId].length - ocupados.length;
+    },
+
+    courtAvailClass(courtId) {
+      const free = this.courtAvailCount(courtId);
+      if (free === 0) return 'avail-badge full';
+      if (free <= 2)  return 'avail-badge low';
+      return 'avail-badge ok';
+    },
+
+    courtAvailText(courtId) {
+      const free = this.courtAvailCount(courtId);
+      if (free === 0) return 'Sin turnos';
+      if (free === 1) return '¡Último turno!';
+      if (free <= 2)  return free + ' turnos';
+      return free + ' turnos libres';
+    },
+
+    init() {
+      this.buildDates();
+      this.adminDate = new Date().toISOString().split('T')[0];
+      this.updateTitle();
+    },
+
+    updateTitle() {
+      const now = new Date();
+      let libres = 0;
+      [1,2,3].forEach(id => {
+        const ocupados = MOCK_OCUPADOS[id] || [];
+        MOCK_SLOTS[id].forEach(h => {
+          const slotHour = parseInt(h.split(':')[0]);
+          const isPast = slotHour !== 0 && slotHour <= now.getHours();
+          if (!ocupados.includes(h) && !isPast) libres++;
+        });
+      });
+      document.title = libres > 0
+        ? '⚽ La Masia · ' + libres + ' turnos libres'
+        : '⚽ La Masia · Sin disponibilidad';
+    },
+
+    buildDates() {
+      const days   = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+      const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+      const today  = new Date();
+      this.dates   = [];
+      for (let i = 0; i < 14; i++) {
+        const d   = new Date(today);
+        d.setDate(today.getDate() + i);
+        const iso = d.toISOString().split('T')[0];
+        this.dates.push({ iso, dayName: days[d.getDay()], dayNum: d.getDate(), monthShort: months[d.getMonth()] });
+      }
+      this.selectedDate = this.dates[0].iso;
+    },
+
+    selectDate(iso) {
+      this.selectedDate = iso;
+      this.selectedSlot = null;
+      if (this.modalOpen) this.loadSlots();
+    },
+
+    openCourt(id) {
+      this.selectedCourt = id;
+      this.selectedSlot  = null;
+      this.tab  = 'reservar';
+      this.form = { nombre: '', telefono: '' };
+      this.modalOpen = true;
+      this.loadSlots();
+    },
+
+    closeModal() { this.modalOpen = false; },
+
+    async loadSlots() {
+      this.loadingSlots = true;
+      this.slots = [];
+      await new Promise(r => setTimeout(r, 400));
+      const ocupados = MOCK_OCUPADOS[this.selectedCourt] || [];
+      const now = new Date();
+      const isToday = this.selectedDate === now.toISOString().split('T')[0];
+      const currentHour = now.getHours();
+      this.slots = MOCK_SLOTS[this.selectedCourt].map(h => {
+        const slotHour = parseInt(h.split(':')[0]);
+        const isPast = isToday && slotHour !== 0 && slotHour <= currentHour;
+        return { hora: h, disponible: !ocupados.includes(h) && !isPast, pasado: isPast };
+      });
+      this.loadingSlots = false;
+      this.updateTitle();
+    },
+
+    selectSlot(hora) { this.selectedSlot = hora; },
+
+    openWaitlistForSlot(hora) {
+      this.tab = 'espera';
+      this.waitlistForm.hora = hora;
+    },
+
+    async confirmarReserva() {
+      if (!this.form.nombre || !this.form.telefono) return;
+      // Validar que el teléfono tenga al menos 8 dígitos
+      const digits = this.form.telefono.replace(/[^0-9]/g, '');
+      if (digits.length < 8) {
+        this.showToast('error', 'Teléfono inválido', 'Ingresá un número de WhatsApp válido para recibir la confirmación.');
+        return;
+      }
+      this.submitting = true;
+      await new Promise(r => setTimeout(r, 1000));
+      this.submitting = false;
+      this.sessionBookings.push({
+        id: Date.now(),
+        court: this.selectedCourt,
+        name: this.courts[this.selectedCourt-1]?.name,
+        courtName: this.courts[this.selectedCourt-1]?.name,
+        date: this.selectedDate,
+        hora: this.selectedSlot,
+        nombre: this.form.nombre,
+        telefono: this.form.telefono,
+      });
+      const court = this.courts[this.selectedCourt-1];
+      const waMsg = '*Reserva confirmada - La Masia*%0A'
+        + 'Cancha: ' + court.name + ' (cancha %23' + this.selectedCourt + ')%0A'
+        + 'Fecha: ' + this.formattedSelectedDate + '%0A'
+        + 'Horario: ' + this.selectedSlot + 'hs';
+      const rawPhone = this.form.telefono.replace(/[^0-9]/g, '');
+      const waPhone = rawPhone.startsWith('54') ? rawPhone : '549' + rawPhone;
+      window.open('https://wa.me/' + waPhone + '?text=' + waMsg, '_blank');
+      this.closeModal();
+      this.showToast('success', '¡Cancha ' + this.selectedCourt + ' reservada!',
+        court.name + ' · ' + this.selectedSlot + 'hs · WhatsApp abierto para confirmar al cliente.');
+      MOCK_OCUPADOS[this.selectedCourt].push(this.selectedSlot);
+      this.updateTitle();
+    },
+
+    async registrarEspera() {
+      if (!this.waitlistForm.nombre || !this.waitlistForm.telefono || !this.waitlistForm.hora) return;
+      this.submitting = true;
+      await new Promise(r => setTimeout(r, 800));
+      this.submitting = false;
+      this.closeModal();
+      this.showToast('waitlist', '¡Anotado en lista de espera!',
+        'Cancha ' + this.selectedCourt + ' · ' + this.courts[this.selectedCourt-1]?.name +
+        ' · ' + this.waitlistForm.hora + 'hs — Te avisamos por WhatsApp si se desocupa.');
+    },
+
+    showToast(type, title, msg) {
+      this.toast = { visible: true, type, title, msg };
+      setTimeout(() => { this.toast.visible = false; }, 10000);
+    },
+
+    openMyBookings() {
+      this.myBookingsOpen   = true;
+      this.myBookings       = [];
+      this.myBookingsPhone  = '';
+      this.myBookingsSearched = false;
+    },
+
+    searchMyBookings() {
+      if (!this.myBookingsPhone) return;
+      const phone = this.myBookingsPhone.trim();
+      this.myBookings = this.sessionBookings.filter(b => b.telefono === phone);
+      this.myBookingsSearched = true;
+    },
+
+    openAdmin() {
+      this.adminOpen = true;
+      this.adminTab  = 'reservas';
+      this.adminDate = this.dates[0]?.iso || new Date().toISOString().split('T')[0];
+    },
+
+    adminReservas() {
+      const todayIso = this.adminDate;
+      const session  = this.sessionBookings.map(b => ({
+        id: b.id, court: b.court, courtName: b.courtName || b.name,
+        hora: b.hora, nombre: b.nombre, telefono: b.telefono, date: b.date,
+      }));
+      const mock = this.mockAdminReservas.map(r => ({ ...r, date: new Date().toISOString().split('T')[0] }));
+      return [...mock, ...session]
+        .filter(r => r.date === todayIso)
+        .sort((a, b) => a.hora.localeCompare(b.hora));
+    },
+
+    addBlock() {
+      if (!this.blockForm.hora || !this.blockForm.date) return;
+      this.blockedSlots.push({ ...this.blockForm });
+      this.blockForm = { court: '', hora: '', date: '' };
+    },
+
+    exportWhatsApp() {
+      const reservas = this.adminReservas();
+      if (!reservas.length) { alert('Sin reservas para exportar.'); return; }
+      const lines = reservas.map(r => '\u25b8 ' + r.hora + 'hs \u00b7 C' + r.court + ' ' + r.courtName + ' \u00b7 ' + r.nombre + ' \u00b7 ' + r.telefono);
+      const text  = '*La Masia \u00b7 Reservas del d\u00eda*\n' + this.adminDate + '\n\n' + lines.join('\n');
+      window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+    },
+
+    exportCSV() {
+      const reservas = this.adminReservas();
+      if (!reservas.length) { alert('Sin reservas para exportar.'); return; }
+      const header = 'Cancha,Nombre,Horario,Tel\u00e9fono,Fecha';
+      const rows   = reservas.map(r => 'C' + r.court + ' ' + r.courtName + ',' + r.nombre + ',' + r.hora + ',' + r.telefono + ',' + r.date);
+      const csv    = [header, ...rows].join('\n');
+      const blob   = new Blob([csv], { type: 'text/csv' });
+      const url    = URL.createObjectURL(blob);
+      const a      = document.createElement('a');
+      a.href = url; a.download = 'reservas-' + this.adminDate + '.csv'; a.click();
+      URL.revokeObjectURL(url);
+    },
+  };
+}
+</script>
+<div style="text-align:center;padding:14px;border-top:1px solid var(--border);margin-top:8px;">
+  <!-- LINK DEL PORTFOLIO — cambiarlo cuando esté listo -->
+  <a href="https://www.linkedin.com/in/matias-daniel-bueno/"
+     target="_blank" rel="noopener"
+     style="font-size:12px;color:var(--text-muted);text-decoration:none;">
+    Desarrollado por <span style="color:var(--accent);font-weight:600;">Matias Bueno</span>
+  </a>
+</div>
+</body>
+</html>

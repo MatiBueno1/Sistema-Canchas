@@ -1,0 +1,26 @@
+## .NET build output
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+## Base de datos local (Railway usa volumen persistente)
+*.db
+*.db-shm
+*.db-wal
+/app/data/
+
+## Logs
+*.log
+logs/
+
+## Secrets — NUNCA subir al repo
+appsettings.Development.json
+appsettings.Production.json
+.env
+.env.local
+
+## OS
+.DS_Store
+Thumbs.db

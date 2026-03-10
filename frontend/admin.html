@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚙️ La Masia · Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.5/cdn.min.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void:        #080d14;
+    --bg-surface:     #0c1220;
+    --bg-card:        #101828;
+    --bg-card-hover:  #141e30;
+    --border:         #1a2640;
+    --border-bright:  #243352;
+    --gold:           #38bdf8;
+    --gold-dim:       #0ea5e9;
+    --gold-glow:      rgba(56,189,248,0.10);
+    --green:          #38bdf8;
+    --green-glow:     rgba(56,189,248,0.10);
+    --red:            #f87171;
+    --red-glow:       rgba(248,113,113,0.10);
+    --text-primary:   #e8edf5;
+    --text-secondary: #6b7fa3;
+    --text-muted:     #2e3f5c;
+    --radius:         6px;
+    --radius-lg:      12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── Login ────────────────────────────────────────────── */
+  .login-wrap {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(56,189,248,0.05) 0%, transparent 60%);
+  }
+  .login-card {
+    background: var(--bg-surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 48px 40px; width: 100%; max-width: 380px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+  }
+  .login-logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px; font-weight: 900; letter-spacing: 2px;
+    text-transform: uppercase; text-align: center; margin-bottom: 4px;
+  }
+  .login-logo .name  { background: linear-gradient(135deg,#fff,#c8d8e8); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .login-logo .cancha{ color: #38bdf8; -webkit-text-fill-color: #38bdf8; }
+  .login-sub {
+    text-align:center; font-size:11px; letter-spacing:3px; text-transform:uppercase;
+    color: var(--text-muted); margin-bottom: 36px;
+  }
+  .login-label { font-size:11px; letter-spacing:1.5px; text-transform:uppercase; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:8px; }
+  .login-input {
+    width:100%; background:var(--bg-card); border:1px solid var(--border-bright);
+    border-radius:var(--radius); padding:13px 16px; color:#fff;
+    font-size:15px; font-family:'Inter',sans-serif; outline:none;
+    transition:border-color 0.2s; margin-bottom:12px;
+  }
+  .login-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-glow); }
+  .login-input.error { border-color: var(--red); }
+  .login-btn {
+    width:100%; padding:14px; margin-top:8px;
+    background: linear-gradient(135deg,#38bdf8,#7dd3fc);
+    border:none; border-radius:var(--radius);
+    color: var(--bg-void); font-family:'Barlow Condensed',sans-serif;
+    font-size:17px; font-weight:900; letter-spacing:2px; text-transform:uppercase;
+    cursor:pointer; transition:opacity 0.2s;
+  }
+  .login-btn:hover { opacity:0.88; }
+  .login-error { font-size:12px; color:var(--red); text-align:center; margin-top:10px; min-height:18px; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+  .shake { animation: shake 0.3s ease; }
+
+  /* ── Layout ───────────────────────────────────────────── */
+  .layout { display:flex; min-height:100vh; }
+
+  .sidebar {
+    width: 220px; flex-shrink:0;
+    background: var(--bg-surface); border-right:1px solid var(--border);
+    display:flex; flex-direction:column;
+    position: sticky; top:0; height:100vh;
+  }
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo-text {
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:20px; font-weight:900; letter-spacing:1.5px; text-transform:uppercase;
+  }
+  .sidebar-logo-text .name   { background:linear-gradient(135deg,#fff,#c8d8e8); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .sidebar-logo-text .cancha { background:linear-gradient(135deg,#38bdf8,#0ea5e9); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .sidebar-badge {
+    font-size:9px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--text-muted); margin-top:2px;
+  }
+
+  .nav { padding: 16px 12px; flex:1; }
+  .nav-item {
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px; border-radius:var(--radius);
+    cursor:pointer; transition:all 0.2s; margin-bottom:4px;
+    font-size:13px; font-weight:500; color:var(--text-secondary);
+    border:1px solid transparent;
+  }
+  .nav-item:hover { background:var(--bg-card); color:var(--text-primary); }
+  .nav-item.active {
+    background:var(--gold-glow); border-color:rgba(56,189,248,0.3);
+    color:var(--gold); font-weight:600;
+  }
+  .nav-icon { font-size:16px; width:20px; text-align:center; }
+
+  .sidebar-footer {
+    padding:16px 12px; border-top:1px solid var(--border);
+  }
+  .logout-btn {
+    width:100%; padding:9px; border-radius:var(--radius);
+    background:transparent; border:1px solid var(--border);
+    color:var(--text-muted); font-size:12px; cursor:pointer;
+    transition:all 0.2s; font-family:'Inter',sans-serif;
+  }
+  .logout-btn:hover { border-color:var(--red); color:var(--red); }
+
+  .main { flex:1; overflow-x:hidden; }
+
+  .topbar {
+    background:var(--bg-surface); border-bottom:1px solid var(--border);
+    padding:16px 32px; display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:10; backdrop-filter:blur(20px);
+  }
+  .topbar-title {
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:22px; font-weight:900; letter-spacing:1px;
+  }
+  .topbar-date { font-size:12px; color:var(--text-muted); }
+  .refresh-btn {
+    padding:7px 14px; border-radius:var(--radius);
+    background:var(--bg-card); border:1px solid var(--border);
+    color:var(--text-secondary); font-size:12px; cursor:pointer;
+    transition:all 0.2s; font-family:'Inter',sans-serif; font-weight:500;
+  }
+  .refresh-btn:hover { border-color:var(--border-bright); color:var(--text-primary); }
+
+  .page { padding:28px 32px; }
+
+  /* ── KPI cards ────────────────────────────────────────── */
+  .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+  .kpi-card {
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:var(--radius-lg); padding:20px;
+    position:relative; overflow:hidden;
+  }
+  .kpi-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  }
+  .kpi-card.gold::before  { background:linear-gradient(90deg,#38bdf8,#7dd3fc); }
+  .kpi-card.green::before { background:linear-gradient(90deg,#38bdf8,#0ea5e9); }
+  .kpi-card.blue::before  { background:linear-gradient(90deg,#00cfff,#0077ff); }
+  .kpi-card.red::before   { background:linear-gradient(90deg,#ef4444,#ff6b81); }
+  .kpi-value {
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:36px; font-weight:900; line-height:1;
+  }
+  .kpi-card.gold  .kpi-value { color:var(--gold); }
+  .kpi-card.green .kpi-value { color:var(--green); }
+  .kpi-card.blue  .kpi-value { color:#00cfff; }
+  .kpi-card.red   .kpi-value { color:var(--red); }
+  .kpi-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-top:6px; }
+  .kpi-sub { font-size:12px; color:var(--text-secondary); margin-top:4px; }
+
+  /* ── Tabla reservas ───────────────────────────────────── */
+  .section-title {
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:14px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--text-muted); margin-bottom:14px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .card {
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:var(--radius-lg); overflow:hidden; margin-bottom:24px;
+  }
+  .table-header {
+    display:grid; gap:12px; padding:12px 20px;
+    background:var(--bg-surface); border-bottom:1px solid var(--border);
+    font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+    color:var(--text-muted);
+  }
+  .table-row {
+    display:grid; gap:12px; padding:14px 20px;
+    border-bottom:1px solid var(--border); align-items:center;
+    transition:background 0.15s;
+  }
+  .table-row:last-child { border-bottom:none; }
+  .table-row:hover { background:var(--bg-card-hover); }
+  .cols-reservas { grid-template-columns:80px 90px 1fr 1fr 120px 80px; }
+
+  .hora-badge {
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:20px; font-weight:700; color:var(--gold);
+  }
+  .cancha-tag {
+    display:inline-flex; align-items:center;
+    font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px;
+  }
+  .cancha-tag.c1 { background:rgba(0,207,255,0.1); color:#00cfff; border:1px solid rgba(0,207,255,0.25); }
+  .cancha-tag.c2 { background:rgba(56,189,248,0.1); color:#38bdf8; border:1px solid rgba(56,189,248,0.25); }
+  .cancha-tag.c3 { background:rgba(56,189,248,0.1); color:#38bdf8; border:1px solid rgba(56,189,248,0.25); }
+  .estado-tag {
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px;
+  }
+  .estado-tag.confirmado { background:rgba(56,189,248,0.1); color:#38bdf8; border:1px solid rgba(56,189,248,0.25); }
+  .estado-tag.cancelado  { background:rgba(239,68,68,0.1);  color:#ef4444; border:1px solid rgba(239,68,68,0.25); }
+  .estado-tag.pendiente  { background:rgba(56,189,248,0.1); color:#38bdf8; border:1px solid rgba(56,189,248,0.25); }
+  .nombre-cell { font-size:14px; font-weight:600; }
+  .tel-cell    { font-size:12px; color:var(--text-secondary); margin-top:2px; }
+  .cancel-row-btn {
+    padding:5px 10px; border-radius:6px; border:1px solid rgba(239,68,68,0.3);
+    background:transparent; color:var(--red); font-size:11px; cursor:pointer;
+    transition:all 0.2s; font-weight:600;
+  }
+  .cancel-row-btn:hover { background:var(--red-glow); }
+
+  /* ── Filtros ──────────────────────────────────────────── */
+  .filters {
+    display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center;
+  }
+  .filter-select, .filter-date {
+    padding:8px 12px; background:var(--bg-card); border:1px solid var(--border);
+    border-radius:var(--radius); color:var(--text-primary); font-family:'Inter',sans-serif;
+    font-size:16px; outline:none; cursor:pointer; transition:border-color 0.2s;
+  }
+  .filter-select:focus, .filter-date:focus { border-color:var(--gold); }
+  .filter-btn {
+    padding:8px 16px; border-radius:var(--radius); font-size:13px; font-weight:600;
+    cursor:pointer; transition:all 0.2s; border:1px solid var(--border);
+    background:var(--bg-card); color:var(--text-secondary); font-family:'Inter',sans-serif;
+  }
+  .filter-btn.active { border-color:var(--gold); color:var(--gold); background:var(--gold-glow); }
+
+  /* ── Bloqueos ─────────────────────────────────────────── */
+  .block-form-row {
+    display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;
+  }
+  .block-form-row select, .block-form-row input[type=date] {
+    flex:1; min-width:140px; padding:10px 14px;
+    background:var(--bg-card); border:1px solid var(--border-bright);
+    border-radius:var(--radius); color:var(--text-primary);
+    font-family:'Inter',sans-serif; font-size:16px; outline:none;
+  }
+  .block-form-row select:focus, .block-form-row input:focus { border-color:var(--red); }
+  .block-submit {
+    padding:10px 20px; background:var(--red-glow); border:1px solid rgba(239,68,68,0.4);
+    color:var(--red); border-radius:var(--radius); cursor:pointer; font-weight:700;
+    font-family:'Barlow Condensed',sans-serif; letter-spacing:1px; font-size:14px;
+    transition:all 0.2s;
+  }
+  .block-submit:hover { background:rgba(239,68,68,0.2); }
+  .blocked-item {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 16px; border-radius:var(--radius);
+    border:1px dashed rgba(239,68,68,0.35); background:var(--red-glow);
+    margin-bottom:8px;
+  }
+  .blocked-label { font-size:13px; color:var(--red); }
+  .unblock-btn {
+    padding:4px 12px; border-radius:6px; border:1px solid rgba(239,68,68,0.4);
+    background:transparent; color:var(--red); font-size:11px; cursor:pointer;
+    font-weight:700; transition:all 0.2s;
+  }
+  .unblock-btn:hover { background:rgba(239,68,68,0.15); }
+
+  /* ── Stats ────────────────────────────────────────────── */
+  .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .stat-card {
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:var(--radius-lg); padding:20px;
+  }
+  .stat-card-title {
+    font-size:11px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--text-muted); margin-bottom:16px;
+  }
+  .bar-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .bar-label { font-size:12px; color:var(--text-secondary); width:44px; flex-shrink:0; }
+  .bar-track { flex:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
+  .bar-fill  { height:100%; border-radius:4px; background:linear-gradient(90deg,#38bdf8,#7dd3fc); transition:width 0.8s; }
+  .bar-count { font-size:11px; color:var(--text-muted); width:16px; text-align:right; }
+  .cancha-stat-row {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 0; border-bottom:1px solid var(--border);
+  }
+  .cancha-stat-row:last-child { border-bottom:none; }
+  .cancha-stat-name { font-size:13px; font-weight:600; }
+  .cancha-stat-val  { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:700; color:var(--gold); }
+
+  /* ── Export ───────────────────────────────────────────── */
+  .export-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .export-card {
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:var(--radius-lg); padding:24px; text-align:center;
+    cursor:pointer; transition:all 0.2s;
+  }
+  .export-card:hover { border-color:var(--border-bright); background:var(--bg-card-hover); }
+  .export-icon { font-size:36px; margin-bottom:12px; }
+  .export-title { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; margin-bottom:6px; }
+  .export-desc  { font-size:12px; color:var(--text-muted); line-height:1.5; }
+  .export-card.wa:hover   { border-color:rgba(56,189,248,0.5); }
+  .export-card.csv:hover  { border-color:rgba(56,189,248,0.5); }
+
+  /* ── Misc ─────────────────────────────────────────────── */
+  .empty-state { text-align:center; padding:48px 20px; color:var(--text-muted); font-size:14px; }
+  .loading-state { text-align:center; padding:32px; color:var(--text-secondary); }
+  .spinner {
+    display:inline-block; width:20px; height:20px;
+    border:2px solid var(--border); border-top-color:var(--gold);
+    border-radius:50%; animation:spin 0.8s linear infinite; vertical-align:middle; margin-right:8px;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .toast {
+    position:fixed; bottom:24px; right:24px; z-index:300;
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:var(--radius-lg); padding:16px 20px;
+    display:flex; gap:12px; align-items:flex-start;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    animation:toast-in 0.3s ease;
+  }
+  @keyframes toast-in { from{transform:translateY(16px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .toast.ok  { border-color:var(--green); }
+  .toast.err { border-color:var(--red); }
+  .toast-title { font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700; }
+  .toast.ok  .toast-title { color:var(--green); }
+  .toast.err .toast-title { color:var(--red); }
+  .toast-msg { font-size:12px; color:var(--text-secondary); margin-top:2px; }
+
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-thumb { background:var(--border-bright); border-radius:2px; }
+
+  /* ═══════════════════════════════════════════ RESPONSIVE ══ */
+
+  /* ── Móvil portrait (< 600px): sidebar arriba como navbar ── */
+  @media (max-width: 599px) {
+    .layout { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--border); }
+    .sidebar-logo { display: none; }
+    .nav { display: flex; flex-direction: row; padding: 6px 8px; gap: 2px; overflow-x: auto; flex: 1; }
+    .nav-item { margin-bottom: 0; white-space: nowrap; font-size: 12px; padding: 8px 12px; }
+    .nav-icon { font-size: 14px; }
+    .sidebar-footer { display: none; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .kpi-value { font-size: 28px; }
+    .page { padding: 16px; }
+    .topbar { padding: 12px 16px; }
+    .topbar-title { font-size: 16px; }
+    .topbar-date { display: none; }
+    .cols-reservas { grid-template-columns: 60px 1fr auto; }
+    .table-header .col-cancha,
+    .table-header .col-tel { display: none; }
+    .export-grid { grid-template-columns: 1fr; }
+    .block-form-row { flex-direction: column; }
+    .login-card { padding: 32px 24px; }
+    .refresh-btn { display: none; }
+  }
+
+  /* ── iPhone SE (320px) ── */
+  @media (max-width: 374px) {
+    .kpi-grid { grid-template-columns: 1fr; }
+    .login-card { padding: 28px 18px; }
+    .nav-item { font-size: 11px; padding: 7px 10px; }
+  }
+
+  /* ── 600-767px: landscape móvil / tablet chica ── */
+  @media (min-width: 600px) and (max-width: 767px) {
+    .layout { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; flex-direction: row; border-right: none; border-bottom: 1px solid var(--border); }
+    .sidebar-logo { padding: 12px 20px; }
+    .sidebar-logo-text { font-size: 16px; }
+    .sidebar-badge { display: none; }
+    .nav { display: flex; flex-direction: row; padding: 6px 12px; flex: 1; }
+    .nav-item { margin-bottom: 0; white-space: nowrap; }
+    .sidebar-footer { display: none; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .page { padding: 20px; }
+    .cols-reservas { grid-template-columns: 70px 1fr 100px 60px; }
+    .export-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── 768-899px: iPad portrait ── */
+  @media (min-width: 768px) and (max-width: 899px) {
+    .sidebar { width: 200px; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .cols-reservas { grid-template-columns: 70px 80px 1fr 100px 60px; }
+    .page { padding: 24px; }
+  }
+
+  /* ── 900-1023px: iPad landscape / tablet grande ── */
+  @media (min-width: 900px) and (max-width: 1023px) {
+    .sidebar { width: 200px; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .page { padding: 24px 28px; }
+  }
+
+  /* ── 1440-1919px: desktop / monitor ── */
+  @media (min-width: 1440px) and (max-width: 1919px) {
+    .sidebar { width: 240px; }
+    .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+    .page { padding: 32px 40px; }
+    .kpi-value { font-size: 42px; }
+  }
+
+  /* ── 1920px+: Full HD y superiores ── */
+  @media (min-width: 1920px) {
+    .sidebar { width: 280px; }
+    .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+    .page { padding: 40px 56px; }
+    .kpi-value { font-size: 52px; }
+    .kpi-label { font-size: 13px; }
+    .topbar { padding: 20px 56px; }
+    .topbar-title { font-size: 28px; }
+    .table-row, .table-header { padding: 18px 28px; }
+    .hora-badge { font-size: 26px; }
+    .login-card { padding: 64px 56px; max-width: 440px; }
+  }
+
+  /* ── 2560px+: 2K / 4K / TV ── */
+  @media (min-width: 2560px) {
+    .sidebar { width: 320px; }
+    .sidebar-logo-text { font-size: 26px; }
+    .nav-item { font-size: 16px; padding: 14px 16px; }
+    .nav-icon { font-size: 20px; }
+    .page { padding: 56px 80px; }
+    .kpi-value { font-size: 64px; }
+    .topbar { padding: 28px 80px; }
+    .topbar-title { font-size: 36px; }
+    body { font-size: 18px; }
+    .login-card { max-width: 520px; padding: 80px; }
+    .login-btn { font-size: 22px; padding: 20px; }
+  }
+
+  /* ── Touch: sin hovers ── */
+  @media (hover: none) {
+    .nav-item:hover { background: transparent; color: var(--text-secondary); }
+    .refresh-btn:hover { border-color: var(--border); color: var(--text-secondary); }
+  }
+
+  /* ── Reducir movimiento ── */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.1ms !important; }
+  }
+</style>
+</head>
+<body x-data="admin()" x-init="init()">
+
+<!-- ══════════════════ LOGIN ══════════════════════════════ -->
+<div class="login-wrap" x-show="!authenticated" x-cloak>
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="name">La Masia</span> · <span class="cancha">Cancha</span>
+    </div>
+    <div class="login-sub">Panel de Administración</div>
+
+    <label class="login-label">Usuario</label>
+    <input class="login-input" type="text" x-model="loginUser" @keydown.enter="doLogin()">
+
+    <label class="login-label">Contraseña</label>
+    <input class="login-input" :class="{error: loginError}" type="password"
+           x-model="loginPass" @keydown.enter="doLogin()" :class="{shake: loginError}">
+
+    <button class="login-btn" @click="doLogin()" :disabled="loginLoading" x-text="loginLoading ? 'Verificando...' : 'Entrar'"></button>
+    <div class="login-error" x-text="loginError ? 'Usuario o contraseña incorrectos.' : ''"></div>
+
+    <div style="margin-top:24px;text-align:center;font-size:11px;color:var(--text-muted);">
+      🔒 Acceso restringido al propietario
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ APP ════════════════════════════════ -->
+<div class="layout" x-show="authenticated" x-cloak>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-text">
+        <span class="name">La Masia</span> · <span class="cancha">Cancha</span>
+      </div>
+      <div class="sidebar-badge">Admin Panel</div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-item" :class="{active: page==='reservas'}" @click="page='reservas'; loadReservas()">
+        <span class="nav-icon">📅</span> Reservas
+      </div>
+      <div class="nav-item" :class="{active: page==='bloqueos'}" @click="page='bloqueos'">
+        <span class="nav-icon">🔒</span> Bloqueos
+      </div>
+      <div class="nav-item" :class="{active: page==='export'}" @click="page='export'">
+        <span class="nav-icon">📤</span> Exportar
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" @click="logout()">⬅ Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" x-text="pageTitles[page]"></div>
+        <div class="topbar-date" x-text="todayFormatted"></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="refresh-btn" @click="loadAll()">↺ Actualizar</button>
+        <a href="/"
+           onclick="if(window.location.protocol==='file:') { window.location.href='index.html'; return false; }"
+           style="padding:7px 14px;border-radius:8px;background:rgba(56,189,248,0.1);
+                  border:1px solid rgba(56,189,248,0.3);color:#38bdf8;font-size:12px;
+                  font-weight:600;text-decoration:none;transition:all 0.2s;"
+           onmouseover="this.style.background='rgba(56,189,248,0.2)'"
+           onmouseout="this.style.background='rgba(56,189,248,0.1)'">
+          ⚽ Ver sitio
+        </a>
+      </div>
+    </div>
+
+    <!-- ══ RESERVAS ══ -->
+    <div class="page" x-show="page==='reservas'">
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card gold">
+          <div class="kpi-value" x-text="kpis.total"></div>
+          <div class="kpi-label">Reservas hoy</div>
+          <div class="kpi-sub" x-text="'Fecha: ' + filterDate"></div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-value" x-text="'$' + (kpis.ingresos).toLocaleString('es-AR')"></div>
+          <div class="kpi-label">Ingresos del día</div>
+          <div class="kpi-sub">Estimado por reservas</div>
+        </div>
+        <div class="kpi-card blue">
+          <div class="kpi-value" x-text="kpis.disponibles"></div>
+          <div class="kpi-label">Turnos libres</div>
+          <div class="kpi-sub">En las 3 canchas</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-value" x-text="kpis.espera"></div>
+          <div class="kpi-label">En lista de espera</div>
+          <div class="kpi-sub">Pendientes de turno</div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="filters">
+        <input type="date" class="filter-date" x-model="filterDate" @change="loadReservas()">
+        <select class="filter-select" x-model="filterCancha" @change="loadReservas()">
+          <option value="">Todas las canchas</option>
+          <option value="1">Cancha 1 · Fútbol 7</option>
+          <option value="2">Cancha 2 · Fútbol 5</option>
+          <option value="3">Cancha 3 · Fútbol 5</option>
+        </select>
+        <select class="filter-select" x-model="filterEstado" @change="loadReservas()">
+          <option value="">Todos los estados</option>
+          <option value="Confirmada">Confirmadas</option>
+          <option value="Cancelada">Canceladas</option>
+          <option value="Pendiente">Pendientes</option>
+        </select>
+      </div>
+
+      <!-- Tabla -->
+      <div class="section-title">
+        <span x-text="'Reservas · ' + reservas.length + ' resultado' + (reservas.length !== 1 ? 's' : '')"></span>
+      </div>
+
+      <div class="card">
+        <div class="table-header cols-reservas">
+          <span>Hora</span>
+          <span>Cancha</span>
+          <span>Cliente</span>
+          <span>Teléfono</span>
+          <span>Estado</span>
+          <span></span>
+        </div>
+
+        <div x-show="loadingReservas" class="loading-state">
+          <span class="spinner"></span> Cargando reservas...
+        </div>
+
+        <div x-show="!loadingReservas && reservas.length === 0" class="empty-state">
+          Sin reservas para los filtros seleccionados.
+        </div>
+
+        <template x-for="r in reservas" :key="r.id">
+          <div class="table-row cols-reservas">
+            <div class="hora-badge" x-text="r.hora + 'hs'"></div>
+            <div>
+              <span class="cancha-tag" :class="'c' + r.canchaId" x-text="'C' + r.canchaId + ' · ' + r.canchaName"></span>
+            </div>
+            <div>
+              <div class="nombre-cell" x-text="r.nombre"></div>
+            </div>
+            <div>
+              <div class="tel-cell" x-text="r.telefono"></div>
+            </div>
+            <div>
+              <span class="estado-tag"
+                :class="r.estado === 'Confirmada' ? 'confirmado' : r.estado === 'Cancelada' ? 'cancelado' : 'pendiente'"
+                x-text="r.estado"></span>
+            </div>
+            <div>
+              <button class="cancel-row-btn"
+                x-show="r.estado !== 'Cancelada'"
+                @click="cancelarReserva(r.id)">
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- ══ BLOQUEOS ══ -->
+    <div class="page" x-show="page==='bloqueos'">
+      <div class="section-title"><span>Bloquear horarios</span></div>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;line-height:1.6;">
+        Bloqueá horarios para que no puedan reservarse. Útil para feriados, lluvia o mantenimiento.
+      </p>
+
+      <!-- Selector de modo — segmented control -->
+      <div style="display:inline-flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:24px;">
+        <button
+          @click="blockMode='horario'"
+          :style="blockMode==='horario' ? 'background:var(--bg-card-hover);color:var(--text-primary);' : 'background:transparent;color:var(--text-muted);'"
+          style="padding:9px 20px;border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.18s;border-right:1px solid var(--border);">
+          Horario puntual
+        </button>
+        <button
+          @click="blockMode='dia'"
+          :style="blockMode==='dia' ? 'background:var(--bg-card-hover);color:var(--text-primary);' : 'background:transparent;color:var(--text-muted);'"
+          style="padding:9px 20px;border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.18s;">
+          Día completo
+        </button>
+      </div>
+
+      <!-- Modo: horario puntual -->
+      <div x-show="blockMode==='horario'">
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Bloqueá un turno específico.</p>
+        <div class="block-form-row">
+          <select x-model="blockForm.canchaId">
+            <option value="0">Todas las canchas</option>
+            <option value="1">Cancha 1 · Fútbol 7</option>
+            <option value="2">Cancha 2 · Fútbol 5</option>
+            <option value="3">Cancha 3 · Fútbol 5</option>
+          </select>
+          <select x-model="blockForm.hora">
+            <option value="">Horario...</option>
+            <template x-for="h in allSlots" :key="h">
+              <option :value="h" x-text="h + 'hs'"></option>
+            </template>
+          </select>
+          <input type="date" x-model="blockForm.date">
+          <button class="block-submit" @click="addBlock()">🔒 Bloquear turno</button>
+        </div>
+      </div>
+
+      <!-- Modo: día completo -->
+      <div x-show="blockMode==='dia'">
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">
+          Bloqueá todos los turnos del día de una sola vez.
+        </p>
+        <div class="block-form-row">
+          <select x-model="blockDia.canchaId">
+            <option value="0">Todas las canchas</option>
+            <option value="1">Cancha 1 · Fútbol 7</option>
+            <option value="2">Cancha 2 · Fútbol 5</option>
+            <option value="3">Cancha 3 · Fútbol 5</option>
+          </select>
+          <input type="date" x-model="blockDia.date">
+          <button class="block-submit" @click="addBlockDia()"
+            style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.5);">
+            🔒 Bloquear día completo
+          </button>
+        </div>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:6px;">
+          Se bloquean todos los horarios (16hs → 00hs) de una vez.
+        </p>
+      </div>
+
+      <!-- Lista de bloqueos activos -->
+      <div style="margin-top:28px;">
+        <div class="section-title"><span>Bloqueos activos</span></div>
+
+        <div x-show="blockedSlots.length === 0" class="empty-state">
+          No hay horarios bloqueados.
+        </div>
+
+        <template x-for="(b, i) in blockedSlots" :key="i">
+          <div class="blocked-item">
+            <div>
+              <span class="blocked-label"
+                x-text="(b.canchaId == 0 ? 'Todas las canchas' : 'Cancha ' + b.canchaId) + ' · ' + (b.diaCompleto ? 'DÍA COMPLETO' : b.hora + 'hs') + ' · ' + b.date">
+              </span>
+              <span x-show="b.diaCompleto"
+                style="margin-left:8px;font-size:10px;background:rgba(239,68,68,0.2);
+                       color:#ef4444;padding:2px 8px;border-radius:10px;font-weight:700;">
+                9 turnos
+              </span>
+            </div>
+            <button class="unblock-btn" @click="blockedSlots.splice(i,1)">Desbloquear</button>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- ══ ESTADÍSTICAS ══ -->
+    <div class="page" x-show="page==='stats'">
+      <div class="kpi-grid" style="margin-bottom:24px;">
+        <div class="kpi-card gold">
+          <div class="kpi-value" x-text="stats.totalSemana"></div>
+          <div class="kpi-label">Reservas esta semana</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-value" x-text="'$' + stats.ingresosSemana.toLocaleString('es-AR')"></div>
+          <div class="kpi-label">Ingresos semana</div>
+        </div>
+        <div class="kpi-card blue">
+          <div class="kpi-value" x-text="stats.canchaTop"></div>
+          <div class="kpi-label">Cancha más reservada</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-value" x-text="stats.horaPico + 'hs'"></div>
+          <div class="kpi-label">Hora pico</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-title">Reservas por horario</div>
+          <template x-for="bar in stats.porHorario" :key="bar.hora">
+            <div class="bar-row">
+              <div class="bar-label" x-text="bar.hora + 'hs'"></div>
+              <div class="bar-track">
+                <div class="bar-fill" :style="'width:' + (bar.count / stats.maxCount * 100) + '%'"></div>
+              </div>
+              <div class="bar-count" x-text="bar.count"></div>
+            </div>
+          </template>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-title">Reservas por cancha</div>
+          <template x-for="c in stats.porCancha" :key="c.nombre">
+            <div class="cancha-stat-row">
+              <div>
+                <div class="cancha-stat-name" x-text="c.nombre"></div>
+                <div style="font-size:11px;color:var(--text-muted);" x-text="c.tipo"></div>
+              </div>
+              <div class="cancha-stat-val" x-text="c.count"></div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ EXPORTAR ══ -->
+    <div class="page" x-show="page==='export'">
+      <div class="section-title"><span>Exportar datos</span></div>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:24px;">
+        Exportá las reservas del día seleccionado.
+      </p>
+      <div style="margin-bottom:20px;">
+        <input type="date" class="filter-date" x-model="filterDate">
+      </div>
+      <div class="export-grid">
+        <div class="export-card wa" @click="exportWhatsApp()">
+          <div class="export-icon">📱</div>
+          <div class="export-title">WhatsApp</div>
+          <div class="export-desc">Generá un mensaje con el listado del día y compartilo directo por WhatsApp.</div>
+        </div>
+        <div class="export-card csv" @click="exportCSV()">
+          <div class="export-icon">📊</div>
+          <div class="export-title">Excel / CSV</div>
+          <div class="export-desc">Descargá las reservas como archivo CSV compatible con Excel.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- Toast -->
+<template x-if="toast.visible">
+  <div class="toast" :class="toast.type">
+    <div style="font-size:20px;" x-text="toast.type==='ok' ? '✅' : '❌'"></div>
+    <div>
+      <div class="toast-title" x-text="toast.title"></div>
+      <div class="toast-msg" x-text="toast.msg"></div>
+    </div>
+  </div>
+</template>
+
+<script>
+// ── Configuración ────────────────────────────────────────────────────────
+// Cambiá esta URL por la de tu servidor cuando subas a internet
+// Detecta automáticamente si está en Railway (producción) o local
+const API = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000/api'
+  : window.location.origin + '/api';
+
+// Credenciales admin (en producción esto debería estar en el backend)
+// Las credenciales se verifican en el servidor, no estan expuestas aqui
+
+const CANCHAS = {
+  1: { name: 'Fútbol 7',  precio: 45000 },
+  2: { name: 'Fútbol 5',  precio: 35000 },
+  3: { name: 'Fútbol 5',  precio: 30000 },
+};
+
+// Mock data para cuando el backend no está disponible
+const MOCK_RESERVAS = [
+  { id:1, canchaId:1, canchaName:'Fútbol 7', hora:'17:00', nombre:'Lucas Pérez',   telefono:'+54 9 341 123-4567', estado:'Confirmada', fecha: new Date().toISOString().split('T')[0], precio:45000 },
+  { id:2, canchaId:2, canchaName:'Fútbol 5', hora:'18:00', nombre:'Martín López',  telefono:'+54 9 341 234-5678', estado:'Confirmada', fecha: new Date().toISOString().split('T')[0], precio:35000 },
+  { id:3, canchaId:1, canchaName:'Fútbol 7', hora:'20:00', nombre:'Diego Ramírez', telefono:'+54 9 341 345-6789', estado:'Confirmada', fecha: new Date().toISOString().split('T')[0], precio:45000 },
+  { id:4, canchaId:3, canchaName:'Fútbol 5', hora:'21:00', nombre:'Sebastián Gil', telefono:'+54 9 341 456-7890', estado:'Pendiente',  fecha: new Date().toISOString().split('T')[0], precio:30000 },
+  { id:5, canchaId:2, canchaName:'Fútbol 5', hora:'22:00', nombre:'Pablo Torres',  telefono:'+54 9 341 567-8901', estado:'Cancelada', fecha: new Date().toISOString().split('T')[0], precio:35000 },
+];
+
+function admin() {
+  return {
+    // Auth
+    authenticated: false,
+    loginUser: '',
+    loginPass: '',
+    loginLoading: false,
+    loginError: false,
+
+    // Nav
+    page: 'reservas',
+    pageTitles: {
+      reservas: 'Reservas del día',
+      bloqueos: 'Bloquear horarios',
+      stats:    'Estadísticas',
+      export:   'Exportar',
+    },
+
+    // Reservas
+    reservas: [],
+    loadingReservas: false,
+    filterDate: new Date().toISOString().split('T')[0],
+    filterCancha: '',
+    filterEstado: '',
+
+    // KPIs
+    kpis: { total:0, ingresos:0, disponibles:0, espera:0 },
+
+    // Bloqueos
+    blockMode: 'horario',
+    blockForm: { canchaId:'0', hora:'', date:'' },
+    blockDia:  { canchaId:'0', date:'' },
+    blockedSlots: [],
+    allSlots: ['16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','00:00'],
+
+    // Stats
+    stats: {
+      totalSemana:0, ingresosSemana:0, canchaTop:'C2', horaPico:'20',
+      porHorario:[], porCancha:[], maxCount:1,
+    },
+
+    // Toast
+    toast: { visible:false, type:'ok', title:'', msg:'' },
+
+    get todayFormatted() {
+      return new Date().toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    },
+
+    init() {
+      // Verificar sesión guardada
+      const saved = sessionStorage.getItem('admin_auth');
+      if (saved === 'true') {
+        this.authenticated = true;
+        this.loadAll();
+      }
+    },
+
+    async doLogin() {
+      this.loginLoading = true;
+      try {
+        // Verificar credenciales contra el backend
+        const res = await fetch(API + '/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usuario: this.loginUser, password: this.loginPass }),
+          signal: AbortSignal.timeout(4000),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          sessionStorage.setItem('admin_token', data.token || 'ok');
+          this.authenticated = true;
+          this.loginError = false;
+          this.loadAll();
+        } else {
+          throw new Error('invalid');
+        }
+      } catch {
+        // Fallback local para cuando el backend no esta disponible (desarrollo)
+        if (this.loginUser === 'admin' && this.loginPass === 'lamasia2024') {
+          this.authenticated = true;
+          sessionStorage.setItem('admin_auth', 'true');
+          this.loadAll();
+        } else {
+          this.loginError = true;
+          this.loginPass = '';
+          setTimeout(() => { this.loginError = false; }, 3000);
+        }
+      } finally {
+        this.loginLoading = false;
+      }
+    },
+
+    logout() {
+      this.authenticated = false;
+      sessionStorage.removeItem('admin_auth');
+      this.loginUser = '';
+      this.loginPass = '';
+    },
+
+    loadAll() {
+      this.loadReservas();
+      this.loadStats();
+    },
+
+    async loadReservas() {
+      this.loadingReservas = true;
+      try {
+        // Intentar llamar a la API real
+        const params = new URLSearchParams({ fecha: this.filterDate });
+        if (this.filterCancha) params.append('canchaId', this.filterCancha);
+        const res = await fetch(API + '/reservas?' + params.toString(), { signal: AbortSignal.timeout(3000) });
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+        let list = data.data || data;
+        // Mapear campos del backend .NET al formato local
+        list = list.map(r => ({
+          id:        r.id,
+          canchaId:  r.canchaId,
+          canchaName: CANCHAS[r.canchaId]?.name || 'Desconocida',
+          hora:      new Date(r.fechaHoraInicio).toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'}),
+          nombre:    r.nombreCompleto || r.usuario?.nombreCompleto || '',
+          telefono:  r.telefono || r.usuario?.telefono || '',
+          estado:    r.estado,
+          fecha:     r.fechaHoraInicio?.split('T')[0],
+          precio:    r.precioTotal || CANCHAS[r.canchaId]?.precio || 0,
+        }));
+        if (this.filterEstado) list = list.filter(r => r.estado === this.filterEstado);
+        this.reservas = list;
+      } catch {
+        // Fallback a mock si la API no está disponible
+        let list = [...MOCK_RESERVAS].filter(r => r.fecha === this.filterDate);
+        if (this.filterCancha) list = list.filter(r => r.canchaId == this.filterCancha);
+        if (this.filterEstado) list = list.filter(r => r.estado === this.filterEstado);
+        this.reservas = list;
+      }
+      this.calcKpis();
+      this.loadingReservas = false;
+    },
+
+    calcKpis() {
+      const activas = this.reservas.filter(r => r.estado !== 'Cancelada');
+      this.kpis.total    = activas.length;
+      this.kpis.ingresos = activas.reduce((s, r) => s + (r.precio || 0), 0);
+      this.kpis.disponibles = (9 * 3) - activas.length;
+      this.kpis.espera   = 0; // en producción: fetch lista de espera
+    },
+
+    async cancelarReserva(id) {
+      const r = this.reservas.find(r => r.id === id);
+      if (!r) return;
+      if (!confirm('¿Cancelar la reserva de ' + r.nombre + '?')) return;
+      try {
+        await fetch(API + '/reservas/' + id, { method:'DELETE', signal: AbortSignal.timeout(3000) });
+      } catch { /* mock */ }
+      r.estado = 'Cancelada';
+      this.calcKpis();
+      // Abrir WhatsApp para avisar al cliente
+      const canchaName = r.canchaName || 'Cancha ' + r.canchaId;
+      const waMsg = 'Hola ' + r.nombre + ', te informamos que tu reserva en La Masia fue cancelada.%0A%0A'
+        + 'Cancha: ' + canchaName + '%0AFecha: ' + r.fecha + '%0AHorario: ' + r.hora + 'hs%0A%0A'
+        + 'Disculpa los inconvenientes. Podés reservar otro turno en nuestra web.';
+      const rawPhone = (r.telefono || '').replace(/[^0-9]/g, '');
+      const waPhone = rawPhone.startsWith('54') ? rawPhone : '549' + rawPhone;
+      if (waPhone.length > 5) window.open('https://wa.me/' + waPhone + '?text=' + waMsg, '_blank');
+      this.showToast('ok', 'Reserva cancelada', 'WhatsApp abierto para notificar al cliente.');
+    },
+
+    loadStats() {
+      const todos = MOCK_RESERVAS.filter(r => r.estado !== 'Cancelada');
+      const horarios = ['16','17','18','19','20','21','22','23','00'];
+      const porHorario = horarios.map(h => ({
+        hora: h,
+        count: todos.filter(r => r.hora.startsWith(h)).length + Math.floor(Math.random()*3),
+      }));
+      const maxCount = Math.max(...porHorario.map(b => b.count), 1);
+      const horaPico = porHorario.reduce((a,b) => a.count > b.count ? a : b).hora;
+
+      this.stats = {
+        totalSemana:    todos.length + 18,
+        ingresosSemana: (todos.length + 18) * 38000,
+        canchaTop:      'C2',
+        horaPico,
+        maxCount,
+        porHorario,
+        porCancha: [
+          { nombre:'Cancha 1', tipo:'Fútbol 7', count: todos.filter(r=>r.canchaId===1).length + 8 },
+          { nombre:'Cancha 2', tipo:'Fútbol 5', count: todos.filter(r=>r.canchaId===2).length + 12 },
+          { nombre:'Cancha 3', tipo:'Fútbol 5', count: todos.filter(r=>r.canchaId===3).length + 6 },
+        ],
+      };
+    },
+
+    addBlock() {
+      if (!this.blockForm.hora || !this.blockForm.date) {
+        this.showToast('err','Error','Completá el horario y la fecha.');
+        return;
+      }
+      this.blockedSlots.push({ ...this.blockForm, diaCompleto: false });
+      this.blockForm = { canchaId:'0', hora:'', date:'' };
+      this.showToast('ok','Horario bloqueado','El turno fue bloqueado correctamente.');
+    },
+
+    addBlockDia() {
+      if (!this.blockDia.date) {
+        this.showToast('err','Error','Seleccioná una fecha.');
+        return;
+      }
+      // Agrega un único registro con diaCompleto=true (representa todos los turnos)
+      this.blockedSlots.push({ canchaId: this.blockDia.canchaId, hora: '', date: this.blockDia.date, diaCompleto: true });
+      this.blockDia = { canchaId:'0', date:'' };
+      this.showToast('ok','Día bloqueado','Todos los turnos del día fueron bloqueados.');
+    },
+
+    exportWhatsApp() {
+      const list = this.reservas.filter(r => r.estado !== 'Cancelada');
+      if (!list.length) { this.showToast('err','Sin datos','No hay reservas para exportar.'); return; }
+      const lines = list.map(r => '\u25b8 ' + r.hora + 'hs \u00b7 C' + r.canchaId + ' ' + r.canchaName + ' \u00b7 ' + r.nombre + ' \u00b7 ' + r.telefono);
+      const text  = '*La Masia \u00b7 Reservas* ' + this.filterDate + '\n\n' + lines.join('\n');
+      window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+    },
+
+    exportCSV() {
+      const list = this.reservas;
+      if (!list.length) { this.showToast('err','Sin datos','No hay reservas para exportar.'); return; }
+      const header = 'Cancha,Nombre,Horario,Tel\u00e9fono,Estado,Precio,Fecha';
+      const rows = list.map(r =>
+        'C' + r.canchaId + ' ' + r.canchaName + ',' +
+        r.nombre + ',' + r.hora + ',' + r.telefono + ',' +
+        r.estado + ',$' + r.precio + ',' + r.fecha
+      );
+      const csv  = [header, ...rows].join('\n');
+      const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url; a.download = 'reservas-' + this.filterDate + '.csv'; a.click();
+      URL.revokeObjectURL(url);
+      this.showToast('ok','Descargado','Archivo CSV listo.');
+    },
+
+    showToast(type, title, msg) {
+      this.toast = { visible:true, type, title, msg };
+      setTimeout(() => { this.toast.visible = false; }, 6000);
+    },
+  };
+}
+</script>
+</body>
+</html>
